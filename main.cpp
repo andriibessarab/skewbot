@@ -39,4 +39,8 @@ struct skewb_state {
     void reset() {
         *this = skewb_state();
     }
+
+    bool isEqual(const skewb_state state) const {
+        return this->center_colors == state.center_colors && this->corner_permutations == state.corner_permutations && this->corner_orientations == state.corner_orientations;
+    }
 };
