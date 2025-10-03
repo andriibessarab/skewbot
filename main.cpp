@@ -5,9 +5,6 @@
 #include <string>
 
 
-struct skewb_state;
-
-
 std::ofstream output("Output.txt", std::ios::app);
 
 
@@ -16,14 +13,6 @@ std::string history = "";
 int depth = 0;
 
 
-int main() {
-    if (!output) {
-        std::cout << "Error opening file" << std::endl;
-        return 1;
-    }
-
-    return 0;
-}
 
 
 enum CENTER {
@@ -272,7 +261,21 @@ void BFS(int depth, skewb_state CurrentState, std::string solution, char LastSol
     if (!q.empty()) {
         std::tuple<skewb_state, char, std::string> LastQueue = q.front();
         q.pop();
-        BFS(depth + 1, std::get<0>(LastQueue), std::get<2>(LastQueue), std::get<1>(LastQueue));
+        BFS(std::get<2>(LastQueue).size(), std::get<0>(LastQueue), std::get<2>(LastQueue), std::get<1>(LastQueue));
     }
 
 }
+
+
+int main() {
+    if (!output) {
+        std::cout << "Error opening file" << std::endl;
+        return 1;
+    }
+
+    skewb_state InitialState = skewb_state();
+    BFS(0, InitialState, "", ' ');
+
+    return 0;
+}
+
