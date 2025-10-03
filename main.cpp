@@ -2,8 +2,8 @@
 #include <queue>
 #include <fstream>
 #include <iostream>
-#include <cctype>
 #include <string>
+#include <unordered_map>
 
 
 
@@ -11,8 +11,10 @@ std::ofstream output("Output.txt", std::ios::app);
 
 
 std::string history = "";
+std::unordered_map<std::string, std::string> history_map;
+long TotalReduced = 0;
 
-int depth = 0;
+
 
 
 
@@ -221,11 +223,18 @@ std::queue<std::tuple<skewb_state, char, std::string,int>> q;
 
 void BFS() {
     while (!q.empty()) {
+
         auto [CurrentState, lastmove,history,depth] = q.front();
         q.pop();
-        if (depth > 5) {
+        if (depth > 11) {
             continue;
         }
+        if (TotalReduced%1000==0) {
+            std::cout <<"Current Depth: "<< depth << std::endl;
+        }
+        std::string solut;
+        std::string scramble;
+
         if (lastmove == 'U') {
             CurrentState.u_move(false);
         } else if (lastmove == 'u') {
@@ -244,19 +253,25 @@ void BFS() {
             CurrentState.b_move(true);
         }
         for (int i = 0; i < CurrentState.center_colors.size(); i++) {
-            output << center_to_string(CurrentState.center_colors[i]);
+            scramble += center_to_string(CurrentState.center_colors[i]);
         }
-        output << " ";
         for (int i = 0; i < CurrentState.corner_permutations.size(); i++) {
-            output << corner_to_string(CurrentState.corner_permutations[i]) << " ";
+            scramble+= corner_to_string(CurrentState.corner_permutations[i]) + " ";
         }
-        output << " ";
+        scramble += " ";
         for (int i = 0; i < CurrentState.corner_orientations.size(); i++) {
-            output << CurrentState.corner_orientations[i];
+            scramble+= std::to_string(CurrentState.corner_orientations[i]);
         }
-        output << " ";
 
-        output << history << " " << get_solution(history) << std::endl;
+        solut += history + " " + get_solution(history);
+        if (history_map.find(scramble) == history_map.end()) {
+            history_map[scramble] = solut;
+
+        }else {
+            TotalReduced++;
+            continue;
+        }
+
         for (char i: {'R','L','U','B'}) {
 
             if (i != static_cast<char>(std::toupper(lastmove))) {
@@ -278,6 +293,11 @@ int main() {
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ',"",0));
     BFS();
+    for (auto i= history_map.begin(); i != history_map.end(); i++) {
+        output << i->first << " " << i->second << std::endl;
+    }
+    std::cout <<"Total Amount Reduced: "<< TotalReduced<< std::endl;
+    output.close();
 
     return 0;
 }
