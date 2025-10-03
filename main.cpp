@@ -2,9 +2,9 @@
 #include <queue>
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <unordered_map>
-
+#include <set>
+#include <string>
 
 
 std::ofstream output("Output.txt", std::ios::app);
@@ -13,8 +13,6 @@ std::ofstream output("Output.txt", std::ios::app);
 std::string history = "";
 std::unordered_map<std::string, std::string> history_map;
 long TotalReduced = 0;
-
-
 
 
 
@@ -46,23 +44,18 @@ struct skewb_state {
 
     std::vector<CORNER> corner_permutations;
 
-    std::vector<int> corner_orientations;
-
-
-
-
+    std::unordered_map<CORNER, int> corner_orientations;
 
     skewb_state() : center_colors{W, G, O, B, R, Y},
                     corner_permutations{UFR, UFL, UBL, UBR, DFR, DFL, DBL, DBR},
-                    corner_orientations{0, 0, 0, 0, 0, 0, 0, 0} {
+                    corner_orientations{
+                        {UFR, 0}, {UFL, 0}, {UBL, 0}, {UBR, 0}, {DFR, 0}, {DFL, 0}, {DBL, 0}, {DBR, 0}
+                    } {
     }
 
     void reset() {
         *this = skewb_state();
     }
-
-
-
 
     skewb_state copy() const {
         skewb_state result;
@@ -73,7 +66,7 @@ struct skewb_state {
     }
 
 
-    [[nodiscard]] bool is_equal(const skewb_state& state) const {
+    [[nodiscard]] bool is_equal(const skewb_state &state) const {
         return this->center_colors == state.center_colors && this->corner_permutations == state.corner_permutations &&
                this->corner_orientations == state.corner_orientations;
     }
@@ -92,10 +85,10 @@ struct skewb_state {
         corner_permutations[6] = corner_permutations[4];
         corner_permutations[4] = temp_c;
 
-        corner_orientations[1] -= 1;
-        corner_orientations[4] -= 1;
-        corner_orientations[5] -= 1;
-        corner_orientations[6] -= 1;
+        corner_orientations[corner_permutations[1]] += 2;
+        corner_orientations[corner_permutations[4]] += 2;
+        corner_orientations[corner_permutations[5]] += 2;
+        corner_orientations[corner_permutations[6]] += 2;
 
         normalize_orientations();
     }
@@ -115,10 +108,10 @@ struct skewb_state {
         corner_permutations[4] = corner_permutations[6];
         corner_permutations[6] = temp_c;
 
-        corner_orientations[3] -= 1;
-        corner_orientations[4] -= 1;
-        corner_orientations[6] -= 1;
-        corner_orientations[7] -= 1;
+        corner_orientations[corner_permutations[3]] += 2;
+        corner_orientations[corner_permutations[4]] += 2;
+        corner_orientations[corner_permutations[6]] += 2;
+        corner_orientations[corner_permutations[7]] += 2;
 
         normalize_orientations();
     }
@@ -138,10 +131,10 @@ struct skewb_state {
         corner_permutations[3] = corner_permutations[6];
         corner_permutations[6] = temp_c;
 
-        corner_orientations[1] -= 1;
-        corner_orientations[2] -= 1;
-        corner_orientations[3] -= 1;
-        corner_orientations[6] -= 1;
+        corner_orientations[corner_permutations[1]] += 2;
+        corner_orientations[corner_permutations[2]] += 2;
+        corner_orientations[corner_permutations[3]] += 2;
+        corner_orientations[corner_permutations[6]] += 2;
 
         normalize_orientations();
     }
@@ -160,24 +153,20 @@ struct skewb_state {
         corner_permutations[7] = corner_permutations[5];
         corner_permutations[5] = temp_c;
 
-        corner_orientations[2] -= 1;
-        corner_orientations[5] -= 1;
-        corner_orientations[6] -= 1;
-        corner_orientations[7] -= 1;
+        // swap
+
+        corner_orientations[corner_permutations[2]] += 1;
+        corner_orientations[corner_permutations[5]] += 1;
+        corner_orientations[corner_permutations[6]] += 1;
+        corner_orientations[corner_permutations[7]] += 1;
 
         normalize_orientations();
     }
 
     void normalize_orientations() {
-        for (int & corner_orientation : corner_orientations) {
-            int orientation = corner_orientation;
-
-            orientation %= 3;
-
-            if (orientation < 0)
-                orientation += 3;
-
-            corner_orientation = orientation;
+        for (auto& element : corner_orientations) {
+            int& orientation_value = element.second;
+            orientation_value %= 3;
         }
     }
 };
@@ -208,17 +197,17 @@ std::string corner_to_string(CORNER c) {
     }
     return "?";
 }
+
 std::string get_solution(std::string history) {
     std::string solution = "";
-    for (int i = history.size()-1; i >= 0; i--) {
+    for (int i = history.size() - 1; i >= 0; i--) {
         //makes char Uppercase if lower, and lower if upper (inverted moves)
-        std::isupper(history[i])?solution+=std::tolower(history[i]):solution+=std::toupper(history[i]);
-
+        std::isupper(history[i]) ? solution += std::tolower(history[i]) : solution += std::toupper(history[i]);
     }
     return solution;
 }
-std::queue<std::tuple<skewb_state, char, std::string,int>> q;
 
+std::queue<std::tuple<skewb_state, char, std::string, int> > q;
 
 
 void BFS() {
@@ -226,11 +215,8 @@ void BFS() {
 
         auto [CurrentState, lastmove,history,depth] = q.front();
         q.pop();
-        if (depth > 11) {
+        if (depth > 5) {
             continue;
-        }
-        if (TotalReduced%1000==0) {
-            std::cout <<"Current Depth: "<< depth << std::endl;
         }
         std::string solut;
         std::string scramble;
@@ -258,9 +244,11 @@ void BFS() {
         for (int i = 0; i < CurrentState.corner_permutations.size(); i++) {
             scramble+= corner_to_string(CurrentState.corner_permutations[i]) + " ";
         }
+
         scramble += " ";
+
         for (int i = 0; i < CurrentState.corner_orientations.size(); i++) {
-            scramble+= std::to_string(CurrentState.corner_orientations[i]);
+            scramble+= std::to_string(CurrentState.corner_orientations[CurrentState.corner_permutations[i]]);
         }
 
         solut += history + " " + get_solution(history);
@@ -273,10 +261,10 @@ void BFS() {
         }
 
         for (char i: {'R','L','U','B'}) {
-
             if (i != static_cast<char>(std::toupper(lastmove))) {
-                q.push(std::make_tuple(CurrentState.copy(), i, history+i,depth+1));
-                q.push(std::make_tuple(CurrentState.copy(), static_cast<char>(std::tolower(i)), history+ static_cast<char>(std::tolower(i)),depth+1));
+                q.push(std::make_tuple(CurrentState.copy(), i, history + i, depth + 1));
+                q.push(std::make_tuple(CurrentState.copy(), static_cast<char>(std::tolower(i)),
+                                       history + static_cast<char>(std::tolower(i)), depth + 1));
             }
         }
     }
@@ -291,7 +279,7 @@ int main() {
 
 
     skewb_state InitialState = skewb_state();
-    q.push(std::make_tuple(InitialState, ' ',"",0));
+    q.push(std::make_tuple(InitialState, ' ', "", 0));
     BFS();
     for (auto i= history_map.begin(); i != history_map.end(); i++) {
         output << i->first << " " << i->second << std::endl;
@@ -301,5 +289,3 @@ int main() {
 
     return 0;
 }
-
-
