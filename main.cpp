@@ -2,7 +2,9 @@
 #include <queue>
 #include <fstream>
 #include <iostream>
+#include <cctype>
 #include <string>
+
 
 
 std::ofstream output("Output.txt", std::ios::app);
@@ -105,6 +107,7 @@ struct skewb_state {
         center_colors[4] = center_colors[5];
         center_colors[5] = temp;
 
+
         const CORNER temp_c = corner_permutations[3];
         corner_permutations[3] = corner_permutations[4];
         corner_permutations[4] = corner_permutations[6];
@@ -117,6 +120,7 @@ struct skewb_state {
 
         normalize_orientations();
     }
+
 
     void u_move(const bool inv) {
         if (inv)
@@ -146,8 +150,8 @@ struct skewb_state {
 
         const CENTER temp = center_colors[2];
         center_colors[2] = center_colors[3];
-        center_colors[3] = center_colors[6];
-        center_colors[6] = temp;
+        center_colors[3] = center_colors[5];
+        center_colors[5] = temp;
 
         const CORNER temp_c = corner_permutations[2];
         corner_permutations[2] = corner_permutations[7];
@@ -202,68 +206,65 @@ std::string corner_to_string(CORNER c) {
     }
     return "?";
 }
+std::string get_solution(std::string history) {
+    std::string solution = "";
+    for (int i = history.size()-1; i >= 0; i--) {
+        //makes char Uppercase if lower, and lower if upper (inverted moves)
+        std::isupper(history[i])?solution+=std::tolower(history[i]):solution+=std::toupper(history[i]);
 
-std::queue<std::tuple<skewb_state, char, std::string> > q;
+    }
+    return solution;
+}
+std::queue<std::tuple<skewb_state, char, std::string,int>> q;
 
 
-void BFS(int depth, skewb_state CurrentState, std::string solution, char LastSolutionMove) {
-    if (depth > 11) {
-        return;
-    }
-    //NOTE: The moves are purposefully inverted as the inverse of the scramble should be the solution
-    //and the inverse of the solution should be the actual scramble
-    if (LastSolutionMove == 'U') {
-        CurrentState.r_move(true);
-    } else if (LastSolutionMove == 'u') {
-        CurrentState.r_move(false);
-    } else if (LastSolutionMove == 'L') {
-        CurrentState.l_move(true);
-    } else if (LastSolutionMove == 'l') {
-        CurrentState.l_move(false);
-    } else if (LastSolutionMove == 'R') {
-        CurrentState.r_move(true);
-    } else if (LastSolutionMove == 'r') {
-        CurrentState.r_move(false);
-    } else if (LastSolutionMove == 'B') {
-        CurrentState.b_move(true);
-    } else if (LastSolutionMove == 'b') {
-        CurrentState.b_move(false);
-    }
-    for (int i = 0; i < CurrentState.center_colors.size(); i++) {
-        output << center_to_string(CurrentState.center_colors[i]);
-    }
-    output << " ";
-    for (int i = 0; i < CurrentState.corner_permutations.size(); i++) {
-        output << corner_to_string(CurrentState.corner_permutations[i]);
-    }
-    output << " ";
-    for (int i = 0; i < CurrentState.corner_orientations.size(); i++) {
-        output << CurrentState.corner_orientations[i];
-    }
-    output << " ";
-    output << solution << std::endl;
-    if (LastSolutionMove != 'R' && LastSolutionMove != 'r') {
-        q.push(std::make_tuple(CurrentState.copy(), 'R', solution + 'R'));
-        q.push(std::make_tuple(CurrentState.copy(), 'r', solution + 'r'));
-    }
-    if (LastSolutionMove != 'L' && LastSolutionMove != 'l') {
-        q.push(std::make_tuple(CurrentState.copy(), 'L', solution + 'L'));
-        q.push(std::make_tuple(CurrentState.copy(), 'l', solution + 'l'));
-    }
-    if (LastSolutionMove != 'U' && LastSolutionMove != 'u') {
-        q.push(std::make_tuple(CurrentState.copy(), 'U', solution + 'U'));
-        q.push(std::make_tuple(CurrentState.copy(), 'u', solution + 'u'));
-    }
-    if (LastSolutionMove != 'B' && LastSolutionMove != 'b') {
-        q.push(std::make_tuple(CurrentState.copy(), 'B', solution + 'B'));
-        q.push(std::make_tuple(CurrentState.copy(), 'b', solution + 'b'));
-    }
-    if (!q.empty()) {
-        std::tuple<skewb_state, char, std::string> LastQueue = q.front();
+
+void BFS() {
+    while (!q.empty()) {
+        auto [CurrentState, lastmove,history,depth] = q.front();
         q.pop();
-        BFS(std::get<2>(LastQueue).size(), std::get<0>(LastQueue), std::get<2>(LastQueue), std::get<1>(LastQueue));
-    }
+        if (depth > 5) {
+            continue;
+        }
+        if (lastmove == 'U') {
+            CurrentState.u_move(false);
+        } else if (lastmove == 'u') {
+            CurrentState.u_move(true);
+        } else if (lastmove == 'L') {
+            CurrentState.l_move(false);
+        } else if (lastmove == 'l') {
+            CurrentState.l_move(true);
+        } else if (lastmove == 'R') {
+            CurrentState.r_move(false);
+        } else if (lastmove == 'r') {
+            CurrentState.r_move(true);
+        } else if (lastmove == 'B') {
+            CurrentState.b_move(false);
+        } else if (lastmove == 'b') {
+            CurrentState.b_move(true);
+        }
+        for (int i = 0; i < CurrentState.center_colors.size(); i++) {
+            output << center_to_string(CurrentState.center_colors[i]);
+        }
+        output << " ";
+        for (int i = 0; i < CurrentState.corner_permutations.size(); i++) {
+            output << corner_to_string(CurrentState.corner_permutations[i]) << " ";
+        }
+        output << " ";
+        for (int i = 0; i < CurrentState.corner_orientations.size(); i++) {
+            output << CurrentState.corner_orientations[i];
+        }
+        output << " ";
 
+        output << history << " " << get_solution(history) << std::endl;
+        for (char i: {'R','L','U','B'}) {
+
+            if (i != static_cast<char>(std::toupper(lastmove))) {
+                q.push(std::make_tuple(CurrentState.copy(), i, history+i,depth+1));
+                q.push(std::make_tuple(CurrentState.copy(), static_cast<char>(std::tolower(i)), history+ static_cast<char>(std::tolower(i)),depth+1));
+            }
+        }
+    }
 }
 
 
@@ -273,9 +274,12 @@ int main() {
         return 1;
     }
 
+
     skewb_state InitialState = skewb_state();
-    BFS(0, InitialState, "", ' ');
+    q.push(std::make_tuple(InitialState, ' ',"",0));
+    BFS();
 
     return 0;
 }
+
 
