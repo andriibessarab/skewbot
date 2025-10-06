@@ -3,4 +3,7 @@ project(sckewbot)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(sckewbot main.cpp)
+add_executable(sckewbot main.cpp
+        TransformDataIntoBin.cpp
+        BinDecoder.cpp
+)
