@@ -26,8 +26,11 @@ struct skewb_state {
     skewb_state()
         : center_colors{W, G, O, B, R, Y},
           corner_permutations{UFR, UFL, UBL, UBR, DFR, DFL, DBL, DBR},
-          corner_orientations{{UFR, 0}, {UFL, 0}, {UBL, 0}, {UBR, 0},
-                              {DFR, 0}, {DFL, 0}, {DBL, 0}, {DBR, 0}} {}
+          corner_orientations{
+              {UFR, 0}, {UFL, 0}, {UBL, 0}, {UBR, 0},
+              {DFR, 0}, {DFL, 0}, {DBL, 0}, {DBR, 0}
+          } {
+    }
 
     void reset() { *this = skewb_state(); }
 
@@ -132,7 +135,7 @@ struct skewb_state {
     }
 
     void normalize_orientations() {
-        for (auto &element : corner_orientations) {
+        for (auto &element: corner_orientations) {
             int &orientation_value = element.second;
             orientation_value %= 3;
         }
@@ -183,8 +186,9 @@ std::string get_solution(std::string history) {
     std::string solution = "";
     for (int i = history.size() - 1; i >= 0; i--) {
         // makes char Uppercase if lower, and lower if upper (inverted moves)
-        std::isupper(history[i]) ? solution += std::tolower(history[i])
-                                 : solution += std::toupper(history[i]);
+        std::isupper(history[i])
+            ? solution += std::tolower(history[i])
+            : solution += std::toupper(history[i]);
     }
     return solution;
 }
@@ -221,9 +225,9 @@ void BFS() {
         for (int i = 0; i < CurrentState.center_colors.size(); i++) {
             scramble += center_to_string(CurrentState.center_colors[i]);
         }
+        scramble += " ";
         for (int i = 0; i < CurrentState.corner_permutations.size(); i++) {
-            scramble +=
-                corner_to_string(CurrentState.corner_permutations[i]) + " ";
+            scramble += corner_to_string(CurrentState.corner_permutations[i]) + " ";
         }
 
         scramble += " ";
@@ -231,7 +235,7 @@ void BFS() {
         for (int i = 0; i < CurrentState.corner_orientations.size(); i++) {
             scramble += std::to_string(
                 CurrentState
-                    .corner_orientations[CurrentState.corner_permutations[i]]);
+                .corner_orientations[CurrentState.corner_permutations[i]]);
         }
 
         solut += history + " " + get_solution(history);
@@ -242,7 +246,7 @@ void BFS() {
             continue;
         }
 
-        for (char i : {'R', 'L', 'U', 'B'}) {
+        for (char i: {'R', 'L', 'U', 'B'}) {
             if (i != static_cast<char>(std::toupper(lastmove))) {
                 q.push(std::make_tuple(CurrentState.copy(), i, history + i,
                                        depth + 1));
@@ -259,6 +263,7 @@ int main() {
         std::cout << "Error opening file" << std::endl;
         return 1;
     }
+
 
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ', "", 0));
