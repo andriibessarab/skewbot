@@ -23,7 +23,7 @@ The Skewb Solving Robot is designed to scan the cube using a single optical sens
 
 ## Software
 
-The control system is written in C++ using the VEXcodeIQ.
+The control system is written in C++ using the VEXcodeIQ. The robot pulls from a compressed bin file that contains all the optimal ways to solve a Skewb in the fewest amount of moves. This data was found through a BFS taken from the solution state and inversing the moves to find the solution at every new position reached. This data was then compressed into a bin file by bitpacking each skewb state and it's solution into unsigned 64 and 32 bit integers respectively. 
 
 ## Team
 
