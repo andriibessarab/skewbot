@@ -4,10 +4,11 @@
 
 ## Purpose
 
-The Skewb Solving Robot is designed to scan the cube using a single optical sensor, find the solution from a list of all solutions, and execute rotations using a four-motor system.
+The Skewb Solving Robot is designed to receieve the state of a scanned Skewb, find the solution from a list of all solutions, and execute rotations using a four-motor system.
 
 ## Features
 
+- Website using device camera to scan Skewb state
 - Semi-autonomous Skewb solving from any valid state
 - Distance sensor for cube placement verification
 - LED touch sensor for start/abort control
