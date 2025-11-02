@@ -6,7 +6,7 @@ function DisplayColors(props:Props){
     return (
         <>
           {props.Arr.map((avg, i) => (
-            <div
+            <div key = {i}
               style={{
                 width: "30px",
                 height: "30px",

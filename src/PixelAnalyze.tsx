@@ -1,5 +1,7 @@
 import React from "react";
 import DisplayColors from "./DisplayColors";
+var GlobalAveragePixelValues: number[][] = [];
+
 function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimensions: number[]){
     let AverageScanSideLength = 10; // For each PixelPoint needed to analyze, take the average around a square with length 10px 
     let AveragePixelValues:number[][] = [];
@@ -17,17 +19,13 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
         }
         AveragePixelValues.push(CurAverage);
     }
+    GlobalAveragePixelValues = AveragePixelValues;
    
     return (
         <>
           <DisplayColors Arr={AveragePixelValues} />
-
         </>
       );
-      
-
-      
-      
     
 }
 
@@ -56,3 +54,4 @@ function GetPixelIndex(x:number,y:number,Dimensions:number[]){
     
 }
 export default PixelAnalyze;
+export {GlobalAveragePixelValues};
