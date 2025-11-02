@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import Webcam from "./Webcam";
-import SkewbFace from "./DisplaySides";
-import SaveColors from "./ClickMeButton";
+import SaveColors from "./SaveColors";
 
 
 function App(){

@@ -14,15 +14,15 @@ function SaveColors() {
   return (
     <div>
       <button onClick={handleClick}>Save Colors</button>
-    <p style={{display:"flex", gap:"75px",textDecoration:"underline"}}>
-    <span>Face1</span>
-    <span>Face2</span>
-    <span>Face3</span>
-    <span>Face4</span>
-    <span>Face5</span>
-    <span>Face6</span>
+    <p style={{display:"flex", gap:"90px",textDecoration:"underline"}}>
+    <span>Top</span>
+    <span>Front</span>
+    <span>Left</span>
+    <span>Back</span>
+    <span>Right</span>
+    <span>Bottom</span>
     </p>
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
         {faces.map((colors, key) => (
           <SkewbFace key = {key} Colors={colors} />
         ))}

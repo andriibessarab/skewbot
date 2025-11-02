@@ -1,15 +1,22 @@
-import React from "react";
 import DisplayColors from "./DisplayColors";
 var GlobalAveragePixelValues: number[][] = [];
 
 function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimensions: number[]){
-    let AverageScanSideLength = 10; // For each PixelPoint needed to analyze, take the average around a square with length 10px 
+    let AverageScanSideLength = 8; // For each PixelPoint needed to analyze, take the average around a square with length 10px 
     let AveragePixelValues:number[][] = [];
+    const KnownPixelValues: {[key:string]:number[]} = {
+      "Red": [255, 0, 0],
+      "Orange": [255, 165, 0],
+      "Yellow": [255, 255, 0],
+      "Green": [0, 255, 0],
+      "Blue": [0, 0, 255],
+      "White": [255, 255, 255]
+    };
     for (let i = 0; i < PixelPoints.length; i++){
-        let CurAverage:number[] = [0,0,0,0];
+        let CurAverage:number[] = [0,0,0];
         for (let j = 0; j < AverageScanSideLength; j++){
             for(let k = 0; k < AverageScanSideLength; k++){
-                let Point:number[] = GetRGBA(GetPixelIndex(PixelPoints[i][0]-(AverageScanSideLength/2)+k,PixelPoints[i][1]-(AverageScanSideLength/2)+j,Dimensions),PixelArray);
+                let Point:number[] = GetRGB(GetPixelIndex(PixelPoints[i][0]-(AverageScanSideLength/2)+k,PixelPoints[i][1]-(AverageScanSideLength/2)+j,Dimensions),PixelArray);
                 for (let z = 0; z < CurAverage.length; z++){
                     CurAverage[z] += Point[z]/(AverageScanSideLength*AverageScanSideLength);
                 }
@@ -19,7 +26,26 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
         }
         AveragePixelValues.push(CurAverage);
     }
-    GlobalAveragePixelValues = AveragePixelValues;
+    for (let i = 0; i < AveragePixelValues.length; i++){
+      let SmallestDiff = 1000000;
+      let ValueOfDiff:number[] = [];
+      for (let color in KnownPixelValues){
+        let diff =
+        Math.abs(AveragePixelValues[i][0] - KnownPixelValues[color][0]) +
+        Math.abs(AveragePixelValues[i][1] - KnownPixelValues[color][1]) +
+        Math.abs(AveragePixelValues[i][2] - KnownPixelValues[color][2]);
+        if (diff < SmallestDiff){
+          ValueOfDiff = KnownPixelValues[color];
+          SmallestDiff = diff;
+        }
+
+      }
+      AveragePixelValues[i] = ValueOfDiff;
+      console.log(AveragePixelValues[i]);
+    }
+
+
+      GlobalAveragePixelValues = AveragePixelValues;
    
     return (
         <>
@@ -29,25 +55,8 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
     
 }
 
-function Output(i:number){
-    switch (i) {
-      case 0:
-        return ": Center ";
-      case 1:
-        return ": TopLeft";
-      case 2:
-        return ": TopRight";
-      case 3:
-        return ": BottomRight";
-      case 4:
-        return ": BottomLeft";
-      default:
-        return "";
-    }
-    
-}
-function GetRGBA(index:number,PixelArray:Uint8ClampedArray){
-    return [PixelArray[index],PixelArray[index+1],PixelArray[index+2],PixelArray[index+3]]
+function GetRGB(index:number,PixelArray:Uint8ClampedArray){
+    return [PixelArray[index],PixelArray[index+1],PixelArray[index+2]]
 }
 function GetPixelIndex(x:number,y:number,Dimensions:number[]){
     return  (y*Dimensions[0]+x)*4;

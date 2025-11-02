@@ -10,7 +10,8 @@ function DisplayColors(props:Props){
               style={{
                 width: "30px",
                 height: "30px",
-                backgroundColor: `rgba(${avg[0]}, ${avg[1]}, ${avg[2]}, ${avg[3]/255})`,
+                backgroundColor: `rgb(${avg[0]}, ${avg[1]}, ${avg[2]})`,
+                border: '2px solid black'
               }}
             > <span style= {{position: "absolute", display: "inline-block",left:"35px"}}>{Output(i)}</span> </div>
     
