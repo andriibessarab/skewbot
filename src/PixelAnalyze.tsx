@@ -41,7 +41,7 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
 
       }
       AveragePixelValues[i] = ValueOfDiff;
-      console.log(AveragePixelValues[i]);
+
     }
 
 

@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef} from "react";
 import PixelAnalyze from "./PixelAnalyze";
+import { GlobalSavedValues } from "./DisplaySides";
+
 
 function Webcam(){
     let [WebcamStatus, SetWebCamStatus] = useState<string>("WebcamOff");
@@ -80,6 +82,7 @@ function Webcam(){
                 ctx.stroke();
             }
                 setOutputDivs(PixelAnalyze(PixelsArray,CenterPoints,Dimensions));
+                
                 }
                 requestAnimationFrame(draw);
                 }
