@@ -22,8 +22,12 @@ def index():
     return jsonify({'message': 'hello world'}), 200
 
 
-@app.route('/api/send_state', methods=['POST'])
+@app.route('/api/send_state', methods=['POST', 'OPTIONS'])
 def send_state():
+    # Handle CORS preflight request
+    if request.method == 'OPTIONS':
+        return '', 204
+
     # Ensure content type is JSON
     if not request.is_json:
         return jsonify({'error': 'Invalid content type, expected application/json'}), 415
@@ -51,6 +55,16 @@ def send_state():
 @app.errorhandler(500)
 def handle_internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Max-Age', '86400')
+
+    return response
 
 
 if __name__ == "__main__":
