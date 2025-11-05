@@ -14,13 +14,14 @@ function SaveColors() {
   };
   const handleClearClick = () =>{
     setFaces([]);
-   GlobalSavedValues.length = 0;
+    GlobalSavedValues.length = 0;
+  
+
   }
 
   return (
     <div>
       <button onClick={handleClick}>Save Colors</button>
-      <button onClick = {handleClearClick} style = {{marginLeft: "5vw"}}>Clear Faces</button>
     <p style={{display:"flex", gap:"90px",textDecoration:"underline"}}>
     <span>Top</span>
     <span>Front</span>

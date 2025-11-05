@@ -41,16 +41,15 @@ function SkewbFace({ Colors, FaceIndex }: Props) {
 
 
   useEffect(() => {
-    if (!GlobalSavedValues[FaceIndex]) {
-      GlobalSavedValues[FaceIndex] = [
-        ColorCycleString[FindIndex(colors[0],ColorCycle)],
-        ColorCycleString[FindIndex(colors[2],ColorCycle)],
-        ColorCycleString[FindIndex(colors[1],ColorCycle)],
-        ColorCycleString[FindIndex(colors[4],ColorCycle)],
-        ColorCycleString[FindIndex(colors[3],ColorCycle)],
-      ];
-    }
-  }, [FaceIndex]);
+    GlobalSavedValues[FaceIndex] = [
+      ColorCycleString[FindIndex(colors[0], ColorCycle)],
+      ColorCycleString[FindIndex(colors[2], ColorCycle)],
+      ColorCycleString[FindIndex(colors[1], ColorCycle)],
+      ColorCycleString[FindIndex(colors[4], ColorCycle)],
+      ColorCycleString[FindIndex(colors[3], ColorCycle)],
+    ];
+  }, [FaceIndex, colors]);
+  
 
   const handleClick = (tileIndex: number) => {
     const newColors = [...colors];

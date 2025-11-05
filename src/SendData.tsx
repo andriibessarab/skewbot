@@ -1,7 +1,7 @@
 import { GlobalSavedValues } from "./DisplaySides"
 
 function SendDataButton(){
-    return (<button style={{position:"absolute",right:"50px", top:"50px", width:"10vw",height:"10vh"}}onClick={sendData}>Send Data!</button>)
+    return (<button style={{position:"absolute",right:"50px", top:"50px", width:"10vw",height:"10vh"}}onClick={SendOverData}>Send Data!</button>)
 }
 function SendOverData(){
     console.log(GlobalSavedValues.flat().join(""));
