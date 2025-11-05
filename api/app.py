@@ -1,8 +1,20 @@
+import os
 import re
+import sys
 
 from flask import Flask, jsonify, request
 
+import vex_comm
+
 app = Flask(__name__)
+
+VEX_PORT = os.environ.get('VEX_PORT')
+print(f"Attempting to connect on port: {VEX_PORT}")
+print("(Set VEX_PORT environment variable to override)")
+
+if not vex_comm.init_serial(VEX_PORT):
+    print('FATAL: VEX connection failed. Server is exiting.')
+    sys.exit(1)
 
 
 @app.route('/', methods=['GET'])
@@ -30,7 +42,8 @@ def send_state():
         return jsonify({'error': 'Invalid skewb state format'}), 400
 
     # Send state to VEX controller
-    ...
+    if not vex_comm.send_to_vex(state):
+        return jsonify({'error': 'Failed to send state to VEX controller'}), 500
 
     return jsonify({'status': 'ok', 'received_state': state}), 200
 
