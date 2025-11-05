@@ -2,11 +2,11 @@ import os
 import re
 import sys
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 
 import vex_comm
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='dist')
 
 VEX_PORT = os.environ.get('VEX_PORT')
 print(f"Attempting to connect on port: {VEX_PORT}")
@@ -17,17 +17,8 @@ if not vex_comm.init_serial(VEX_PORT):
     sys.exit(1)
 
 
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({'message': 'hello world'}), 200
-
-
 @app.route('/api/send_state', methods=['POST', 'OPTIONS'])
 def send_state():
-    # Handle CORS preflight request
-    if request.method == 'OPTIONS':
-        return '', 204
-
     # Ensure content type is JSON
     if not request.is_json:
         return jsonify({'error': 'Invalid content type, expected application/json'}), 415
@@ -57,14 +48,17 @@ def handle_internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    response.headers.add('Access-Control-Max-Age', '86400')
+@app.route('/', methods=['GET'])
+def index():
+    return send_from_directory(app.static_folder, 'index.html')
 
-    return response
+
+@app.route('/<path:path>')
+def serve_react_app(path):
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+
+    return send_from_directory(app.static_folder, 'index.html')
 
 
 if __name__ == "__main__":
