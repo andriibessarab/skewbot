@@ -264,7 +264,7 @@ int main() {
         return 1;
     }
 
-
+g
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ', "", 0));
     BFS();
