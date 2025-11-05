@@ -14,8 +14,7 @@ void TransformDataIntoBin() {
     if (!Data.is_open()) {
         cerr << "Error opening output file" << endl;
     }
-
-    ofstream DataOut("SkewSolutions.bin", ios::app | ios::binary);
+    ofstream DataOut("SkewSolutions.bin", ios::binary);
     string centers;
     string cornerorientation;
     string history;
@@ -69,4 +68,9 @@ void TransformDataIntoBin() {
         DataOut.write(reinterpret_cast<const char *>(&EncodedSolution), sizeof(EncodedSolution));
     }
     DataOut.close();
+}
+
+int main() {
+    TransformDataIntoBin();
+    return 0;
 }

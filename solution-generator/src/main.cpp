@@ -258,7 +258,7 @@ void BFS() {
     }
 }
 
-int main() {
+int man() {
     if (!output) {
         std::cout << "Error opening file" << std::endl;
         return 1;
