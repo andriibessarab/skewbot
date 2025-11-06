@@ -276,6 +276,3 @@ g
 
     return 0;
 }
-
-
-// WWRYBRRBOYORGOWYYGOBBRWGYGOGWB
