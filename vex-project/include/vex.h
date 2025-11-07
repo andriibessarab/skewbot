@@ -6,10 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#include <array>
 #include "iq2_cpp.h"
-
-
 
 #endif
 

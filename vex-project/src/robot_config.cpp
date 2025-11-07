@@ -1,3 +1,10 @@
+//----------------------------------------------------------------------------
+//                                                                          
+//  Module:       robot_config.cpp                                                    
+//  Description:  Initializing sensors and default vex stuff                                                                                 
+//                                                                          
+//----------------------------------------------------------------------------
+
 #include "robot_config.h"
 
 brain Brain;

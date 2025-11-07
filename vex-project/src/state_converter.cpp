@@ -1,49 +1,13 @@
+//----------------------------------------------------------------------------
+//                                                                          
+//  Module:       state_converter.cpp                                                    
+//  Description:  Initializing sensors and default vex stuff                                                                                 
+//                                                                          
+//----------------------------------------------------------------------------
+
 #include "state_converter.h"
-#include <algorithm>
-#include <cstring>
 
-// --- Constants ---
-const int MAX_BUFFER_SIZE = 100;
-
-const std::vector<std::array<int, 3>> corners = {
-    {3, 7, 11},   // 0: UFR
-    {4, 6, 22},   // 1: UFL
-    {2, 16, 12},  // 2: UBR
-    {1, 17, 21},  // 3: UBL
-    {27, 8, 14},  // 4: DFR
-    {26, 9, 23},  // 5: DFL
-    {28, 19, 13}, // 6: DBR
-    {29, 18, 24}  // 7: DBL
-};
-
-std::unordered_map<int, int> indexes_map = {
-    {0, 0},
-    {1, 1},
-    {2, 3},
-    {3, 2},
-    {4, 4},
-    {5, 5},
-    {6, 7},
-    {7, 6}
-};
-
-// Helper maps for conversion b/w scanned state and needed cpp struct
-std::unordered_map<char, CENTER> char_to_center = {
-    {'W', W}, {'G', G}, {'O', O}, {'B', B}, {'R', R}, {'Y', Y}
-};
-
-std::unordered_map<std::string, CORNER> colors_to_corner = {
-    {"GRW", UFR}, // W,R,G
-    {"GOW", UFL}, // W,G,O
-    {"BRW", UBR}, // W,B,R
-    {"BOW", UBL}, // W,O,B
-    {"GRY", DFR}, // Y,G,R
-    {"GOY", DFL}, // Y,O,G
-    {"BRY", DBR}, // Y,R,B
-    {"BOY", DBL}  // Y,B,O
-};
-
-// --- Functions ---
+// --- State Conversion Functions ---
 // Find pos. of WGR corner on scanned config
 int get_position_of_inertial_corner(const std::string& state)
 {
@@ -196,7 +160,7 @@ skewb_state convert_state_to_struct(const std::string& state)
     for (int i = 0; i < 8; ++i)
     {
         // indexes map needed due to unconvential order
-        const auto& indices = corners[indexes_map[i]];
+        const auto& indices = corners.at(indexes_map.at(i));
 
         // three colors of the given corner
         char c1 = state[indices[0]];
@@ -229,8 +193,8 @@ skewb_state convert_state_to_struct(const std::string& state)
 }
 
 // --- String Conversion Helpers ---
-
-std::string center_to_string(CENTER c) {
+std::string center_to_string(CENTER c)
+{
     switch (c)
     {
         case W: return "W";

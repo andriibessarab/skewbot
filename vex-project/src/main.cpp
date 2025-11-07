@@ -1,8 +1,7 @@
 //----------------------------------------------------------------------------
 //                                                                          
-//  Module:     main.cpp                                                    
-//  Author:     Andrii Bessarab                                               
-//  Created:    Nov. 4, 2025                                                
+//  Module:       main.cpp                                                    
+//  Description:  The main entrypoint                                                                                   
 //                                                                          
 //----------------------------------------------------------------------------
 
@@ -70,10 +69,7 @@ int main()
 
 /////////////////////////////// LOCAL FUNCTIONS ///////////////////////////////
 
-/**
- * @brief Prints a status message to the VEX Brain screen.
- * @param status The string message to display.
- */
+// Print status updates to brain
 void print_status(std::string status)
 {
     Brain.Screen.clearScreen();
@@ -83,11 +79,7 @@ void print_status(std::string status)
     Brain.Screen.print(status.c_str());
 }
 
-/**
- * @brief Reads a line of text from the serial (stdin).
- * * Blocks until a complete line (ending in \n or \r) is received.
- * * @return The received string, with newline characters trimmed.
- */
+// Get state from serial
 std::string get_state_from_serial()
 {
     char buffer[MAX_BUFFER_SIZE];
