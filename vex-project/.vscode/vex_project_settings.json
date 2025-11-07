@@ -1,0 +1,19 @@
+{
+	"extension": {
+		"version": "0.7.2025041600",
+		"json": 2
+	},
+	"project": {
+		"name": "vex-project",
+		"description": "",
+		"creationDate": "11/6/2025, 1:22:48 PM",
+		"platform": "IQ2",
+		"language": "cpp",
+		"slot": 1,
+		"sdkVersion": "IQ2_20250520_15_00_00",
+		"cpp": {
+			"includePath": [],
+			"printf_float": false
+		}
+	}
+}
