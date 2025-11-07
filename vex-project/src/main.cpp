@@ -31,6 +31,9 @@ int main()
     // Initializing Robot Configuration
     vexcodeInit();
 
+    print_status("Skewb Solver");
+
+    wait(2, seconds);
     print_status("Awaiting state...");
 
     // Get state from serial
@@ -44,9 +47,14 @@ int main()
     std::string state_struct_stringified = skewb_state_to_string(state_struct);
     printf("\n%s\n", state_struct_stringified.c_str());
 
+    wait(2, seconds);
     print_status("Thinking...");
+
     // Obtain solution
 
+
+
+    wait(2, seconds);
     print_status("Ready!");
 
     // Wait for touch to start solve
@@ -56,6 +64,7 @@ int main()
     // Solve
 
     // End the program
+    wait(10, seconds);
     Brain.programStop();
 }
 
@@ -68,7 +77,9 @@ int main()
 void print_status(std::string status)
 {
     Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.setCursor(2, 1);
+    Brain.Screen.print("---SKEWBOT---");
+    Brain.Screen.setCursor(3, 1);
     Brain.Screen.print(status.c_str());
 }
 

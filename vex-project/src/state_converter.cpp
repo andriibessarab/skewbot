@@ -152,7 +152,6 @@ std::string normalize_state(std::string state)
     // if inert corner at the bottom, put it up top
     if (inert_corner_pos >= 4)
     {
-        printf("Must rotate twice to move corner");
         state = state_rotate_x(state_rotate_x(state));
 
         // update position
