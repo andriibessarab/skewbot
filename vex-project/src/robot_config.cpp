@@ -13,6 +13,9 @@ motor top_motor = motor(TOP_MOTOR_PORT);
 motor left_motor = motor(LEFT_MOTOR_PORT);
 motor right_motor = motor(RIGHT_MOTOR_PORT);
 motor back_motor = motor(BACK_MOTOR_PORT);
+distance distance_sensor = distance(DISTANCE_SENSOR_PORT);
+touchled touch_led = touchled(TOUCH_LED_PORT);
+optical optical_sensor = optical(OPTICAL_SENSOR_PORT);
 
 void initializeRandomSeed() {
   wait(100, msec);
