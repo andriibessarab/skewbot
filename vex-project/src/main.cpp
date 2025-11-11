@@ -27,7 +27,7 @@ std::string get_state_from_serial();
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 int main()
 {
-    left_motor.spin(fwd, 80, percent);
+    back_motor.spin(fwd, 20, percent);
     // Initializing Robot Configuration
     vexcodeInit();
 
