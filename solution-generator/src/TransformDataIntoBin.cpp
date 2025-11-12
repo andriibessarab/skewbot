@@ -55,7 +55,7 @@ void TransformDataIntoBin() {
         for (int i = 0; i < cornerorientation.size(); i++) {
             state |= (static_cast<uint32_t>(cornerorientation[i] - '0') << 2 * i);
         }
-        cout << solution;
+
         for (int i = 0; i < solution.size(); i++) {
             for (int j = 0; j < 8; j++) {
                 if (solution[i] == Moves[j]) {

@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-std::ofstream output("Output.txt", std::ios::app);
+std::ofstream output("Output.txt");
 
 std::string history = "";
 std::unordered_map<std::string, std::string> history_map;
@@ -125,10 +125,10 @@ struct skewb_state {
         corner_permutations[3] = temp_c;
 
 
-        corner_orientations[corner_permutations[2]] += 2;
-        corner_orientations[corner_permutations[5]] += 2;
-        corner_orientations[corner_permutations[6]] += 2;
-        corner_orientations[corner_permutations[7]] += 2;
+        corner_orientations[corner_permutations[0]] += 2;
+        corner_orientations[corner_permutations[1]] += 2;
+        corner_orientations[corner_permutations[3]] += 2;
+        corner_orientations[corner_permutations[4]] += 2;
 
         normalize_orientations();
     }
@@ -245,7 +245,7 @@ void BFS() {
             continue;
         }
 
-        for (char i: {'R', 'L', 'U', 'B'}) {
+        for (char i: {'R', 'L', 'U', 'F'}) {
             if (i != static_cast<char>(std::toupper(lastmove))) {
                 q.push(std::make_tuple(CurrentState.copy(), i, history + i,
                                        depth + 1));
@@ -266,10 +266,13 @@ int main() {
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ', "", 0));
     BFS();
+    int total = 0;
     for (auto i = history_map.begin(); i != history_map.end(); i++) {
         output << i->first << " " << i->second << std::endl;
+        total++;
     }
     std::cout << "Total Amount Reduced: " << TotalReduced << std::endl;
+    std::cout << "Total States(should be 3149280):  " << total<< std::endl;
     output.close();
 
     return 0;

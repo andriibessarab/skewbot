@@ -40,3 +40,7 @@ void BinDecoder() {
     }
     DataIn.close();
 }
+int main() {
+    BinDecoder();
+    return 0;
+}
