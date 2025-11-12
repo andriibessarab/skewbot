@@ -3,6 +3,9 @@
 
 using namespace vex;
 
+const int MOTOR_SPEED = 40;        //%
+const int MOTOR_MAX_TORQUE = 100;  //%
+
 const int TOP_MOTOR_PORT = PORT5;
 const int LEFT_MOTOR_PORT = PORT1;
 const int RIGHT_MOTOR_PORT = PORT7;
@@ -11,14 +14,38 @@ const int DISTANCE_SENSOR_PORT = PORT8;
 const int TOUCH_LED_PORT = PORT12;
 const int OPTICAL_SENSOR_PORT = PORT4;
  
+struct custom_motor
+{
+    const int port_number; 
+    motor motor_object;
+    double ideal_position; 
+
+    custom_motor(int port) 
+        : port_number(port), 
+          motor_object(port),
+          ideal_position(0.0)
+    {
+        motor_object.setStopping(hold);                        // hold mode
+        motor_object.setMaxTorque(MOTOR_MAX_TORQUE, percent);  // max out torque
+        motor_object.setVelocity(MOTOR_SPEED, percent);        // max velocity that doesn't stall
+        motor_object.resetPosition();                          // reset encoder
+    }
+
+    void spin_degrees(double degrees_to_spin)
+    {
+        ideal_position += degrees_to_spin;
+        motor_object.spinToPosition(ideal_position, degrees, true);
+    }
+};
+
 extern brain Brain;
 extern inertial BrainInertial;
-extern motor top_motor;
-extern motor left_motor;
-extern motor right_motor;
-extern motor back_motor;
+extern custom_motor top_motor;
+extern custom_motor left_motor;
+extern custom_motor right_motor;
+extern custom_motor back_motor;
 extern distance distance_sensor;
 extern touchled touch_led;
 extern optical optical_sensor;
 
-void vexcodeInit(void);
+void vexcode_init(void);
