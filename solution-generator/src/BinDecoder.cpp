@@ -7,7 +7,7 @@ using namespace std;
 void BinDecoder() {
     char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
     array<string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
-    char Moves[8] = {'L', 'l', 'R', 'r', 'U', 'u', 'B', 'b'};
+    char Moves[8] = {'L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
     ifstream DataIn("SkewSolutions.bin");
     int HOWMUCHYOUWANNAREAD = 10;
     for (int i = 0; i < HOWMUCHYOUWANNAREAD; i++) {

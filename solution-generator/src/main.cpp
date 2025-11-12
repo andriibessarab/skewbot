@@ -217,10 +217,10 @@ void BFS() {
             CurrentState.r_move(false);
         } else if (lastmove == 'r') {
             CurrentState.r_move(true);
-        } else if (lastmove == 'B') {
-            CurrentState.b_move(false);
-        } else if (lastmove == 'b') {
-            CurrentState.b_move(true);
+        } else if (lastmove == 'F') {
+            CurrentState.f_move(false);
+        } else if (lastmove == 'f') {
+            CurrentState.f_move(true);
         }
         for (int i = 0; i < CurrentState.center_colors.size(); i++) {
             scramble += center_to_string(CurrentState.center_colors[i]);
@@ -258,13 +258,12 @@ void BFS() {
     }
 }
 
-int man() {
+int main() {
     if (!output) {
         std::cout << "Error opening file" << std::endl;
         return 1;
     }
 
-g
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ', "", 0));
     BFS();
