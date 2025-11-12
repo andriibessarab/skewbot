@@ -111,25 +111,24 @@ struct skewb_state {
         normalize_orientations();
     }
 
-    void b_move(const bool inv) {
-        if (inv) b_move(false);
+    void f_move(const bool inv) {
+        if (inv) f_move(false);
 
-        const CENTER temp = center_colors[2];
-        center_colors[2] = center_colors[3];
-        center_colors[3] = center_colors[5];
-        center_colors[5] = temp;
+        const CENTER temp = center_colors[0];
+        center_colors[0] = center_colors[1];
+        center_colors[1] = center_colors[4];
+        center_colors[4] = temp;
 
-        const CORNER temp_c = corner_permutations[2];
-        corner_permutations[2] = corner_permutations[7];
-        corner_permutations[7] = corner_permutations[5];
-        corner_permutations[5] = temp_c;
+        const CORNER temp_c = corner_permutations[1];
+        corner_permutations[1] = corner_permutations[4];
+        corner_permutations[4] = corner_permutations[3];
+        corner_permutations[3] = temp_c;
 
-        // swap
 
-        corner_orientations[corner_permutations[2]] += 1;
-        corner_orientations[corner_permutations[5]] += 1;
-        corner_orientations[corner_permutations[6]] += 1;
-        corner_orientations[corner_permutations[7]] += 1;
+        corner_orientations[corner_permutations[2]] += 2;
+        corner_orientations[corner_permutations[5]] += 2;
+        corner_orientations[corner_permutations[6]] += 2;
+        corner_orientations[corner_permutations[7]] += 2;
 
         normalize_orientations();
     }
