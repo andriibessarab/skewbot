@@ -27,44 +27,45 @@ std::string get_state_from_serial();
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 int main()
 {
+    back_motor.spin(fwd, 20, percent);
     // Initializing Robot Configuration
     vexcodeInit();
 
     print_status("Skewb Solver");
 
-    wait(2, seconds);
-    print_status("Awaiting state...");
+    // wait(2, seconds);
+    // print_status("Awaiting state...");
 
-    // Get state from serial
-    std::string raw_state_string = get_state_from_serial();
+    // // Get state from serial
+    // std::string raw_state_string = get_state_from_serial();
 
-    print_status("Processing...");
+    // print_status("Processing...");
 
-    // Process state
-    std::string normalized_state_string = normalize_state(raw_state_string);
-    skewb_state state_struct = convert_state_to_struct(normalized_state_string);
-    std::string state_struct_stringified = skewb_state_to_string(state_struct);
-    printf("\n%s\n", state_struct_stringified.c_str());
+    // // Process state
+    // std::string normalized_state_string = normalize_state(raw_state_string);
+    // skewb_state state_struct = convert_state_to_struct(normalized_state_string);
+    // std::string state_struct_stringified = skewb_state_to_string(state_struct);
+    // printf("\n%s\n", state_struct_stringified.c_str());
 
-    wait(2, seconds);
-    print_status("Thinking...");
+    // wait(2, seconds);
+    // print_status("Thinking...");
 
-    // Obtain solution
+    // // Obtain solution
 
 
 
-    wait(2, seconds);
-    print_status("Ready!");
+    // wait(2, seconds);
+    // print_status("Ready!");
 
-    // Wait for touch to start solve
+    // // Wait for touch to start solve
 
-    // Check sensory data
+    // // Check sensory data
 
-    // Solve
+    // // Solve
 
-    // End the program
-    wait(10, seconds);
-    Brain.programStop();
+    // // End the program
+    // wait(10, seconds);
+    // Brain.programStop();
 }
 
 /////////////////////////////// LOCAL FUNCTIONS ///////////////////////////////
