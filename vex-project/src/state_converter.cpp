@@ -264,7 +264,9 @@ bool orientation_matches(std::string normalized_string, std::string needed_orien
 {
     for(int i = 0; i < 3; ++i)
     {
-        if (normalized_string.find(needed_orientation) != std::string::npos)
+        skewb_state state_struct = convert_state_to_struct(normalized_string);
+        std::string state_struct_stringified = skewb_state_to_string(state_struct);
+        if (state_struct_stringified.find(needed_orientation) != std::string::npos)
             return true;
 
         normalized_string = flip_orientation(normalized_string);
