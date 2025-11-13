@@ -15,8 +15,6 @@
 #include "robot_config.h"
 #include "state_converter.h"
 
-
-
 using namespace vex;
 
 // --- Constants ---
@@ -27,79 +25,98 @@ void print_status(std::string status);
 std::string get_state_from_serial();
 bool CheckOrientation(const std::string &Orientation);
 std::string FindSolutions(const std::string &CubeState, FILE* file);
-
+void perform_a_move(custom_motor &m, bool inverted);
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
+
 int main()
-{   
-    FILE* file = fopen("SkewSolutions.bin", "rb");
-    
-    //back_motor.spin(fwd, 20, percent);
-    
-    // Initializing Robot Configuration
-    vexcodeInit();
-
-    Brain.Screen.setFont(mono12);
-    print_status("Skewb Solver \n");
-    
-
-    if(!file){
-        Brain.Screen.setCursor(4,1);
-        Brain.Screen.print("Failed to open file");
-        Brain.Screen.setCursor(6,1);
-        Brain.Screen.print(" errno = %d (%s)\n", errno, strerror(errno));
-        return 1;
-    }
-    Brain.Screen.setCursor(5,1);
-    Brain.Screen.print("Opened Successfully");
+{
+    // temp
     std::string TestString = "WBROYG UFR DBL UBL UBR UFL DFL DFR DBR";
-    std::string output = FindSolutions(TestString,file);
-    Brain.Screen.setCursor(6,1);
-    Brain.Screen.print("Done: ");
-    Brain.Screen.print(output.c_str());
+  
+    // Configure robot
+    vexcode_init();
+  
+    // Open file
+    FILE* file = fopen("SkewSolutions.bin", "rb");
+  
+    Brain.Screen.setFont(mono12);  // move to config
+  
+    wait(2, seconds);
+    
+
+    // Get state from serial
+    print_status("Awaiting data...");
+    std::string raw_state_string = get_state_from_serial();
+
+    // Process state
+    print_status("Processing...");
+    std::string normalized_state_string = normalize_state(raw_state_string);
+    skewb_state state_struct = convert_state_to_struct(normalized_state_string);
+    std::string state_struct_stringified = skewb_state_to_string(state_struct);
+
+    wait(2, seconds);
+
+    // Obtain solution
+    print_status("Searching...");
+    std::string solution = FindSolutions(TestString,file);
     fclose(file);
+  
+    wait(2, seconds);
+  
+    print_status("Ready!");
+  
+    wait (5, seconds);
     
-    
 
+    // Wait for touch to start solve
 
-    return 0;
+    // Check sensory data
 
+    // Solve
+    print_status("Solving...");
+    for (int i = 0; i < solution.length(); ++i)
+    {
+        char move = solution[i];
 
-    // wait(2, seconds);
-    // print_status("Awaiting state...");
+        switch (move)
+        {
+            case 'U':
+                perform_a_move(back_motor, false);
+                break;
+            case 'u':
+                perform_a_move(back_motor, true);
+                break;
+            case 'L':
+                perform_a_move(left_motor, false);
+                break;
+            case 'l':
+                perform_a_move(left_motor, true);
+                break;
+            case 'R':
+                perform_a_move(right_motor, false);
+                break;
+            case 'r':
+                perform_a_move(right_motor, true);
+                break;
+            case 'F':
+                perform_a_move(top_motor, false);
+                break;
+            case 'f':
+                perform_a_move(top_motor, true);
+                break;
+            default:
+                break;
+        }
+    }
 
-    // // Get state from serial
-    // std::string raw_state_string = get_state_from_serial();
-
-    // print_status("Processing...");
-
-    // // Process state
-    // std::string normalized_state_string = normalize_state(raw_state_string);
-    // skewb_state state_struct = convert_state_to_struct(normalized_state_string);
-    // std::string state_struct_stringified = skewb_state_to_string(state_struct);
-    // printf("\n%s\n", state_struct_stringified.c_str());
-
-    // wait(2, seconds);
-    // print_status("Thinking...");
-
-    // // Obtain solution
-
-    // wait(2, seconds);
-    // print_status("Ready!");
-
-    // // Wait for touch to start solve
-
-    // // Check sensory data
-
-    // // Solve
-
-    // // End the program
-    // wait(10, seconds);
-    // Brain.programStop();
+    // End the program
+    print_status("Solved!");
+    wait(10, seconds);
+    Brain.programStop();
 }
 
 /////////////////////////////// LOCAL FUNCTIONS ///////////////////////////////
-
 // Print status updates to brain
 void print_status(std::string status)
 {
@@ -127,12 +144,14 @@ std::string get_state_from_serial()
     }
 }
 
-struct State_Solution{
+struct State_Solution
+{
     uint64_t CurState;
     uint64_t EncodedSolution;
 };
 
-std::string FindSolutions(const std::string &CubeState, FILE* file) {
+std::string FindSolutions(const std::string &CubeState, FILE* file)
+{
     const int8_t StateSize = 9;
     const int SizeOfBuffer = 300;
     State_Solution Buffer[SizeOfBuffer];
@@ -232,4 +251,16 @@ std::string FindSolutions(const std::string &CubeState, FILE* file) {
 }
 
     return Solution;
+}
+
+void perform_a_move(custom_motor &m, bool inverted)
+{
+    const double SINGLE_MOVE_ANGLE = 120.00;
+
+    if(inverted)
+        m.spin_degrees(-SINGLE_MOVE_ANGLE);
+    else
+        m.spin_degrees(SINGLE_MOVE_ANGLE);
+
+    
 }

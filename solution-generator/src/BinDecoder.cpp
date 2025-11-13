@@ -7,12 +7,12 @@ using namespace std;
 void BinDecoder() {
     char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
     array<string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
-    char Moves[8] = {'L', 'l', 'R', 'r', 'U', 'u', 'B', 'b'};
+    char Moves[9] = {' ','L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
     ifstream DataIn("SkewSolutions.bin");
     int HOWMUCHYOUWANNAREAD = 10;
     for (int i = 0; i < HOWMUCHYOUWANNAREAD; i++) {
         uint64_t State = 0b0;
-        uint32_t EncodedSolution = 0b0;
+        uint64_t EncodedSolution = 0b0;
         string centers;
         DataIn.read(reinterpret_cast<char *>(&State), sizeof(State));
         DataIn.read(reinterpret_cast<char *>(&EncodedSolution), sizeof(EncodedSolution));
@@ -33,10 +33,14 @@ void BinDecoder() {
         }
         cout << " ";
         for (int i = 0; i < 11; i++) {
-            current = (EncodedSolution >> (i * 3)) & 0b111;
+            current = (EncodedSolution >> (i * 4)) & 0b1111;
             cout << Moves[current];
         }
         cout << endl;
     }
     DataIn.close();
+}
+int main() {
+    BinDecoder();
+    return 0;
 }

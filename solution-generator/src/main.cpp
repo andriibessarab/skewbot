@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-std::ofstream output("Output.txt", std::ios::app);
+std::ofstream output("Output.txt");
 
 std::string history = "";
 std::unordered_map<std::string, std::string> history_map;
@@ -111,25 +111,24 @@ struct skewb_state {
         normalize_orientations();
     }
 
-    void b_move(const bool inv) {
-        if (inv) b_move(false);
+    void f_move(const bool inv) {
+        if (inv) f_move(false);
 
-        const CENTER temp = center_colors[2];
-        center_colors[2] = center_colors[3];
-        center_colors[3] = center_colors[5];
-        center_colors[5] = temp;
+        const CENTER temp = center_colors[0];
+        center_colors[0] = center_colors[1];
+        center_colors[1] = center_colors[4];
+        center_colors[4] = temp;
 
-        const CORNER temp_c = corner_permutations[2];
-        corner_permutations[2] = corner_permutations[7];
-        corner_permutations[7] = corner_permutations[5];
-        corner_permutations[5] = temp_c;
+        const CORNER temp_c = corner_permutations[1];
+        corner_permutations[1] = corner_permutations[4];
+        corner_permutations[4] = corner_permutations[3];
+        corner_permutations[3] = temp_c;
 
-        // swap
 
-        corner_orientations[corner_permutations[2]] += 1;
-        corner_orientations[corner_permutations[5]] += 1;
-        corner_orientations[corner_permutations[6]] += 1;
-        corner_orientations[corner_permutations[7]] += 1;
+        corner_orientations[corner_permutations[0]] += 2;
+        corner_orientations[corner_permutations[1]] += 2;
+        corner_orientations[corner_permutations[3]] += 2;
+        corner_orientations[corner_permutations[4]] += 2;
 
         normalize_orientations();
     }
@@ -217,10 +216,10 @@ void BFS() {
             CurrentState.r_move(false);
         } else if (lastmove == 'r') {
             CurrentState.r_move(true);
-        } else if (lastmove == 'B') {
-            CurrentState.b_move(false);
-        } else if (lastmove == 'b') {
-            CurrentState.b_move(true);
+        } else if (lastmove == 'F') {
+            CurrentState.f_move(false);
+        } else if (lastmove == 'f') {
+            CurrentState.f_move(true);
         }
         for (int i = 0; i < CurrentState.center_colors.size(); i++) {
             scramble += center_to_string(CurrentState.center_colors[i]);
@@ -246,7 +245,7 @@ void BFS() {
             continue;
         }
 
-        for (char i: {'R', 'L', 'U', 'B'}) {
+        for (char i: {'R', 'L', 'U', 'F'}) {
             if (i != static_cast<char>(std::toupper(lastmove))) {
                 q.push(std::make_tuple(CurrentState.copy(), i, history + i,
                                        depth + 1));
@@ -258,20 +257,22 @@ void BFS() {
     }
 }
 
-int man() {
+int main() {
     if (!output) {
         std::cout << "Error opening file" << std::endl;
         return 1;
     }
 
-g
     skewb_state InitialState = skewb_state();
     q.push(std::make_tuple(InitialState, ' ', "", 0));
     BFS();
+    int total = 0;
     for (auto i = history_map.begin(); i != history_map.end(); i++) {
         output << i->first << " " << i->second << std::endl;
+        total++;
     }
     std::cout << "Total Amount Reduced: " << TotalReduced << std::endl;
+    std::cout << "Total States(should be 3149280):  " << total<< std::endl;
     output.close();
 
     return 0;
