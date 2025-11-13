@@ -32,7 +32,7 @@ std::string FindSolutions(const std::string &CubeState, FILE* file);
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 int main()
 {   
-    FILE* file = fopen("SkewSolutions.bin","rb");
+    FILE* file = fopen("SkewSolutions.bin", "rb");
     
     //back_motor.spin(fwd, 20, percent);
     
@@ -57,10 +57,8 @@ int main()
     Brain.Screen.setCursor(6,1);
     Brain.Screen.print("Done: ");
     Brain.Screen.print(output.c_str());
-
     fclose(file);
-    wait(5,seconds);
-    Brain.programStop();
+    
     
 
 
@@ -130,11 +128,11 @@ std::string get_state_from_serial()
 }
 
 bool CheckOrientation(const std::string &Orientation){
-    return 0;
+    return 1;
 }
 struct State_Solution{
     uint64_t CurState;
-    uint32_t EncodedSolution;
+    uint64_t EncodedSolution;
 };
 
 std::string FindSolutions(const std::string &CubeState, FILE* file){
@@ -148,7 +146,7 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
     const char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
     std::string Solution;
     const std::array<std::string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
-    const char Moves[8] = {'L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
+    const char Moves[9] = {' ','L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
     int counter = 0;
     for (int8_t i = 0; i < CubeState.length(); i++){
         if (CubeState[i] == ' '){
@@ -207,17 +205,23 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
                 //convert 0,1,2,3,4,5 -> '0','1'...etc
                 Orienation += '0' + current;
             }
-            if(orientation_matches("WWWWBBOGOGYRRYWOBBRRROYOYGYGBG",Orienation)){
+            if (CheckOrientation(Orienation)){
+            //if(orientation_matches("WWWWBBOGOGYRRYWOBBRRROYOYGYGBG",Orienation)){
+                Brain.Screen.setCursor(8,1);
+                Brain.Screen.print(Orienation.c_str());
                 found = true;
                 for (int j = 0; j < 11; j++) {
-                current = (Buffer[i].EncodedSolution >> (j * 3)) & 0b111;
+                current = (Buffer[i].EncodedSolution >> (j * 4)) & 0b1111;
+                if (current == 0){
+                    break;
+                }
                 Solution += Moves[current];
             }
        
                 return Solution;
             }else{
                 counter++;
-                Brain.Screen.setCursor(8,1);
+                Brain.Screen.setCursor(9,1);
                 Brain.Screen.clearLine();
                 Brain.Screen.print(std::to_string(counter).c_str());
                 
