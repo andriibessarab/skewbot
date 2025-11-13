@@ -1,22 +1,22 @@
 //----------------------------------------------------------------------------
-//                                                                          
-//  Module:       state_converter.cpp                                                    
-//  Description:  Initializing sensors and default vex stuff                                                                                 
-//                                                                          
+//
+//  Module:       state_converter.cpp
+//  Description:  Initializing sensors and default vex stuff
+//
 //----------------------------------------------------------------------------
 
 #include "state_converter.h"
 
 // --- State Conversion Functions ---
 // Find pos. of WGR corner on scanned config
-int get_position_of_inertial_corner(const std::string& state)
+int get_position_of_inertial_corner(const std::string &state)
 {
     // Check all 8 corners
     for (int i = 0; i < corners.size(); ++i)
     {
         // Sort them alphabetically and check if
         // the corner has all three colours.
-        const std::array<int, 3>& corner_indices = corners[i];
+        const std::array<int, 3> &corner_indices = corners[i];
 
         // Access the std::string using the [] operator,
         // which works just like accessing a char array.
@@ -34,17 +34,17 @@ int get_position_of_inertial_corner(const std::string& state)
 }
 
 // Find orient. of WGR corner on scanned config
-int get_orientation_of_inertial_corner(const std::string& state, int pos)
+int get_orientation_of_inertial_corner(const std::string &state, int pos)
 {
-    const std::array<int, 3>& indices = corners[pos];
+    const std::array<int, 3> &indices = corners[pos];
 
     // Check which of the 3 stickers is W
     if (state[indices[0]] == 'W')
-        return 0;   // Up
+        return 0; // Up
     else if (state[indices[1]] == 'W')
-        return 1;   // Front
+        return 1; // Front
     else
-        return 2;   // Right
+        return 2; // Right
 }
 
 // State Y rotation
@@ -64,12 +64,12 @@ std::string state_rotate_y(std::string state)
     new_state[28] = state[27];
     new_state[29] = state[28];
 
-    for(int i=0; i<5; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-        new_state[5+i] = state[20+i];
-        new_state[10+i] = state[5+i];
-        new_state[15+i] = state[10+i];
-        new_state[20+i] = state[15+i];
+        new_state[5 + i] = state[20 + i];
+        new_state[10 + i] = state[5 + i];
+        new_state[15 + i] = state[10 + i];
+        new_state[20 + i] = state[15 + i];
     }
     return new_state;
 }
@@ -101,12 +101,18 @@ std::string state_rotate_x(std::string state)
     new_state[23] = state[22];
     new_state[24] = state[23];
 
-    for(int i=0; i<5; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-        new_state[5+i] = state[0+i];
-        new_state[25+i] = state[5+i];
+        new_state[5 + i] = state[0 + i];
+        new_state[25 + i] = state[5 + i];
     }
     return new_state;
+}
+
+// Flip ineritial corner's orientation
+std::string flip_orientation(std::string state)
+{
+    return state_rotate_x(state_rotate_y(state));
 }
 
 // Normalize scanned state
@@ -129,20 +135,20 @@ std::string normalize_state(std::string state)
         state = state_rotate_y(state);
     else if (inert_corner_pos == 3)
         state = state_rotate_y(state_rotate_y(state));
-    
+
     // it's now in correct pos, but could be facing wrogng way
     // get orientation and rotate accordingly
     int inert_corner_orient = get_orientation_of_inertial_corner(state, 0);
-    if(inert_corner_orient == 1)
-        state = state_rotate_x(state_rotate_y(state_rotate_x(state_rotate_y(state))));
+    if (inert_corner_orient == 1)
+        state = flip_orientation(flip_orientation(state));
     else if (inert_corner_orient == 2)
-        state = state_rotate_x(state_rotate_y(state));
-    
+        state = flip_orientation(state);
+
     return state;
 }
 
 // Convert normalized scanned state to cpp struct
-skewb_state convert_state_to_struct(const std::string& state)
+skewb_state convert_state_to_struct(const std::string &state)
 {
     skewb_state new_skewb_state;
     new_skewb_state.corner_permutations.resize(8);
@@ -160,7 +166,7 @@ skewb_state convert_state_to_struct(const std::string& state)
     for (int i = 0; i < 8; ++i)
     {
         // indexes map needed due to unconvential order
-        const auto& indices = corners.at(indexes_map.at(i));
+        const auto &indices = corners.at(indexes_map.at(i));
 
         // three colors of the given corner
         char c1 = state[indices[0]];
@@ -176,7 +182,7 @@ skewb_state convert_state_to_struct(const std::string& state)
         color_key += chars[1];
         color_key += chars[2];
         CORNER piece = colors_to_corner.at(color_key);
-    
+
         new_skewb_state.corner_permutations[i] = piece;
 
         // find orientation
@@ -197,12 +203,18 @@ std::string center_to_string(CENTER c)
 {
     switch (c)
     {
-        case W: return "W";
-        case G: return "G";
-        case O: return "O";
-        case B: return "B";
-        case R: return "R";
-        case Y: return "Y";
+    case W:
+        return "W";
+    case G:
+        return "G";
+    case O:
+        return "O";
+    case B:
+        return "B";
+    case R:
+        return "R";
+    case Y:
+        return "Y";
     }
     return "?";
 }
@@ -211,19 +223,27 @@ std::string corner_to_string(CORNER c)
 {
     switch (c)
     {
-        case UFR: return "UFR";
-        case UFL: return "UFL";
-        case UBL: return "UBL";
-        case UBR: return "UBR";
-        case DFR: return "DFR";
-        case DFL: return "DFL";
-        case DBL: return "DBL";
-        case DBR: return "DBR";
+    case UFR:
+        return "UFR";
+    case UFL:
+        return "UFL";
+    case UBL:
+        return "UBL";
+    case UBR:
+        return "UBR";
+    case DFR:
+        return "DFR";
+    case DFL:
+        return "DFL";
+    case DBL:
+        return "DBL";
+    case DBR:
+        return "DBR";
     }
     return "?";
 }
 
-std::string skewb_state_to_string(const skewb_state& state)
+std::string skewb_state_to_string(const skewb_state &state)
 {
     std::string state_key = "";
 
@@ -251,4 +271,21 @@ std::string skewb_state_to_string(const skewb_state& state)
     }
 
     return state_key;
+}
+
+// --- Needed to Find Solution ---
+bool orientation_matches(std::string normalized_string, std::string needed_orientation)
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        skewb_state state_struct = convert_state_to_struct(normalized_string);
+        std::string state_struct_stringified = skewb_state_to_string(state_struct);
+        //printf("%s %s\n", state_struct_stringified.c_str(), needed_orientation);
+        if (state_struct_stringified.find(needed_orientation) != std::string::npos)
+            return true;
+
+        normalized_string = flip_orientation(normalized_string);
+    }
+
+    return false;
 }
