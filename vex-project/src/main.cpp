@@ -52,10 +52,11 @@ int main()
     }
     Brain.Screen.setCursor(5,1);
     Brain.Screen.print("Opened Successfully");
-    std::string TestString = "BYWOGR UFR UFL UBL UBR DFR DFL DBL DBR";
+    std::string TestString = "WBROYG UFR DBL UBL UBR UFL DFL DFR DBR";
     std::string output = FindSolutions(TestString,file);
     Brain.Screen.setCursor(6,1);
     Brain.Screen.print("Done: ");
+    Brain.Screen.print(output.c_str());
 
     fclose(file);
     wait(5,seconds);
@@ -169,13 +170,11 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
             found = true;
             break;
         }
-        counter++;
+        
        
-        if (counter % 100 == 0){
-            Brain.Screen.setCursor(8,1);
-            Brain.Screen.clearLine();
-            Brain.Screen.print(std::to_string(counter).c_str());
-        }
+   
+           
+        
         for (size_t i = 0; i < ReadCount; i++){
             uint8_t current = 0b0;
             bool IsEliminated = false;
@@ -208,7 +207,7 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
                 //convert 0,1,2,3,4,5 -> '0','1'...etc
                 Orienation += '0' + current;
             }
-            if(CheckOrientation(Orienation)){
+            if(orientation_matches("WWWWBBOGOGYRRYWOBBRRROYOYGYGBG",Orienation)){
                 found = true;
                 for (int j = 0; j < 11; j++) {
                 current = (Buffer[i].EncodedSolution >> (j * 3)) & 0b111;
@@ -216,6 +215,12 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
             }
        
                 return Solution;
+            }else{
+                counter++;
+                Brain.Screen.setCursor(8,1);
+                Brain.Screen.clearLine();
+                Brain.Screen.print(std::to_string(counter).c_str());
+                
             }
         }
         if (ReadCount != SizeOfBuffer){

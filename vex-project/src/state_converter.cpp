@@ -112,7 +112,7 @@ std::string state_rotate_x(std::string state)
 // Flip ineritial corner's orientation
 std::string flip_orientation(std::string state)
 {
-    return state_rotate_x(state_rotate_y(state))
+    return state_rotate_x(state_rotate_y(state));
 }
 
 // Normalize scanned state
@@ -142,7 +142,7 @@ std::string normalize_state(std::string state)
     if(inert_corner_orient == 1)
         state = flip_orientation(flip_orientation(state));
     else if (inert_corner_orient == 2)
-        state = state_rotaflip_orientationte_x(state);
+        state = flip_orientation(state);
     
     return state;
 }
@@ -264,10 +264,10 @@ bool orientation_matches(std::string normalized_string, std::string needed_orien
 {
     for(int i = 0; i < 3; ++i)
     {
-        if (text.find(needed_orientation) != std::string::npos)
+        if (normalized_string.find(needed_orientation) != std::string::npos)
             return true;
 
-        flip_orientation(normalized_string);
+        normalized_string = flip_orientation(normalized_string);
     }
     
     return false;
