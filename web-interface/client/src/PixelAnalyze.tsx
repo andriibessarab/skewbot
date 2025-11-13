@@ -5,13 +5,21 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
     let AverageScanSideLength = 8; // For each PixelPoint needed to analyze, take the average around a square with length 10px 
     let AveragePixelValues:number[][] = [];
     const KnownPixelValues: {[key:string]:number[]} = {
-      "Red": [255, 0, 0],
-      "Orange": [255, 165, 0],
-      "Yellow": [255, 255, 0],
-      "Green": [0, 255, 0],
-      "Blue": [0, 0, 255],
-      "White": [255, 255, 255]
+      "Red": [183, 31, 51],
+      "Orange": [220, 87, 61],
+      "Yellow": [185, 188, 66],
+      "Green": [64, 175, 68],
+      "Blue": [61, 80, 140],
+      "White": [180, 150, 150]
     };
+    const DisplayThesePixelValues: {[key:string]:number[]} = {
+      "Red" : [255,0,0],
+      "Orange":[255,165,0],
+      "Yellow": [255,255,0],
+      "Green":[0,255,0],
+      "Blue":[0,0,255],
+      "White":[255,255,255]
+    }
     for (let i = 0; i < PixelPoints.length; i++){
         let CurAverage:number[] = [0,0,0];
         for (let j = 0; j < AverageScanSideLength; j++){
@@ -24,6 +32,7 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
 
 
         }
+        //console.log(CurAverage);
         AveragePixelValues.push(CurAverage);
     }
     for (let i = 0; i < AveragePixelValues.length; i++){
@@ -35,7 +44,7 @@ function PixelAnalyze(PixelArray: Uint8ClampedArray,PixelPoints:number[][],Dimen
         Math.abs(AveragePixelValues[i][1] - KnownPixelValues[color][1]) +
         Math.abs(AveragePixelValues[i][2] - KnownPixelValues[color][2]);
         if (diff < SmallestDiff){
-          ValueOfDiff = KnownPixelValues[color];
+          ValueOfDiff = DisplayThesePixelValues[color];
           SmallestDiff = diff;
         }
 
