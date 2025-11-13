@@ -109,6 +109,12 @@ std::string state_rotate_x(std::string state)
     return new_state;
 }
 
+// Flip ineritial corner's orientation
+std::string flip_orientation(std::string state)
+{
+    return state_rotate_x(state_rotate_y(state))
+}
+
 // Normalize scanned state
 std::string normalize_state(std::string state)
 {
@@ -134,9 +140,9 @@ std::string normalize_state(std::string state)
     // get orientation and rotate accordingly
     int inert_corner_orient = get_orientation_of_inertial_corner(state, 0);
     if(inert_corner_orient == 1)
-        state = state_rotate_x(state_rotate_y(state_rotate_x(state_rotate_y(state))));
+        state = flip_orientation(flip_orientation(state));
     else if (inert_corner_orient == 2)
-        state = state_rotate_x(state_rotate_y(state));
+        state = state_rotaflip_orientationte_x(state);
     
     return state;
 }
@@ -251,4 +257,18 @@ std::string skewb_state_to_string(const skewb_state& state)
     }
 
     return state_key;
+}
+
+// --- Needed to Find Solution ---
+bool orientation_matches(std::string normalized_string, std::string needed_orientation)
+{
+    for(int i = 0; i < 3; ++i)
+    {
+        if (text.find(needed_orientation) != std::string::npos)
+            return true;
+
+        flip_orientation(normalized_string);
+    }
+    
+    return false;
 }
