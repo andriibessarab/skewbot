@@ -56,7 +56,7 @@ const std::unordered_map<std::string, CORNER> colors_to_corner = {
 };
 
 // --- Function Prototypes ---
-std::string flip_orientation(std;:string state);
+std::string flip_orientation(std::string state);
 std::string normalize_state(std::string state);
 skewb_state convert_state_to_struct(const std::string& state);
 std::string skewb_state_to_string(const skewb_state& state);

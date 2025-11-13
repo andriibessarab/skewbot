@@ -127,15 +127,12 @@ std::string get_state_from_serial()
     }
 }
 
-bool CheckOrientation(const std::string &Orientation){
-    return 1;
-}
 struct State_Solution{
     uint64_t CurState;
     uint64_t EncodedSolution;
 };
 
-std::string FindSolutions(const std::string &CubeState, FILE* file){
+std::string FindSolutions(const std::string &CubeState, FILE* file) {
     const int8_t StateSize = 9;
     const int SizeOfBuffer = 300;
     State_Solution Buffer[SizeOfBuffer];
@@ -205,8 +202,7 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
                 //convert 0,1,2,3,4,5 -> '0','1'...etc
                 Orienation += '0' + current;
             }
-            if (CheckOrientation(Orienation)){
-            //if(orientation_matches("WWWWBBOGOGYRRYWOBBRRROYOYGYGBG",Orienation)){
+            if(orientation_matches("WWWWBBOGOGYRRYWOBBRRROYOYGYGBG",Orienation)){
                 Brain.Screen.setCursor(8,1);
                 Brain.Screen.print(Orienation.c_str());
                 found = true;
@@ -217,7 +213,6 @@ std::string FindSolutions(const std::string &CubeState, FILE* file){
                 }
                 Solution += Moves[current];
             }
-       
                 return Solution;
             }else{
                 counter++;
