@@ -23,13 +23,13 @@ const int MAX_BUFFER_SIZE = 100;
 // --- Local Functions Prototypes ---
 void print_status(std::string status);
 std::string get_state_from_serial();
+void perform_a_move(custom_motor &m, bool inverted);
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 int main()
 {
-    back_motor.spin(fwd, 20, percent);
-    // Initializing Robot Configuration
-    vexcodeInit();
+    // configure robot
+    vexcode_init();
 
     print_status("Skewb Solver");
 
@@ -51,7 +51,7 @@ int main()
     // print_status("Thinking...");
 
     // // Obtain solution
-
+    std::string solution = "";
 
 
     // wait(2, seconds);
@@ -62,6 +62,40 @@ int main()
     // // Check sensory data
 
     // // Solve
+    for (int i = 0; i < solution.length(); ++i)
+    {
+        char move = solution[i];
+
+        switch (move)
+        {
+            case 'U':
+                perform_a_move(back_motor, false);
+                break;
+            case 'u':
+                perform_a_move(back_motor, true);
+                break;
+            case 'L':
+                perform_a_move(left_motor, false);
+                break;
+            case 'l':
+                perform_a_move(left_motor, true);
+                break;
+            case 'R':
+                perform_a_move(right_motor, false);
+                break;
+            case 'r':
+                perform_a_move(right_motor, true);
+                break;
+            case 'F':
+                perform_a_move(top_motor, false);
+                break;
+            case 'f':
+                perform_a_move(top_motor, true);
+                break;
+            default:
+                break;
+        }
+    }
 
     // // End the program
     // wait(10, seconds);
@@ -95,4 +129,16 @@ std::string get_state_from_serial()
         }
         wait(20, msec);
     }
+}
+
+void perform_a_move(custom_motor &m, bool inverted)
+{
+    const double SINGLE_MOVE_ANGLE = 120.00;
+
+    if(inverted)
+        m.spin_degrees(-SINGLE_MOVE_ANGLE);
+    else
+        m.spin_degrees(SINGLE_MOVE_ANGLE);
+
+    
 }

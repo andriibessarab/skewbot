@@ -27,7 +27,7 @@ void initalize_random_seed()
   int seed = int(xAxis + yAxis + zAxis);
   
   srand(seed);
-}\
+}
 
 void vexcode_init(void)
 {

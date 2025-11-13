@@ -3,7 +3,7 @@
 
 using namespace vex;
 
-const int MOTOR_SPEED = 40;        //%
+const int MOTOR_SPEED = 80;        //%
 const int MOTOR_MAX_TORQUE = 100;  //%
 
 const int TOP_MOTOR_PORT = PORT5;
@@ -25,16 +25,20 @@ struct custom_motor
           motor_object(port),
           ideal_position(0.0)
     {
+        motor_object.resetPosition();                          // reset encoder
         motor_object.setStopping(hold);                        // hold mode
         motor_object.setMaxTorque(MOTOR_MAX_TORQUE, percent);  // max out torque
         motor_object.setVelocity(MOTOR_SPEED, percent);        // max velocity that doesn't stall
-        motor_object.resetPosition();                          // reset encoder
     }
 
     void spin_degrees(double degrees_to_spin)
     {
-        ideal_position += degrees_to_spin;
-        motor_object.spinToPosition(ideal_position, degrees, true);
+        motor_object.resetPosition();
+        motor_object.setStopping(hold);                        // hold mode
+        motor_object.setMaxTorque(MOTOR_MAX_TORQUE, percent);  // max out torque
+        motor_object.setVelocity(MOTOR_SPEED, percent);        // max velocity that doesn't stall
+        // ideal_position += degrees_to_spin;
+        motor_object.spinToPosition(degrees_to_spin, degrees, true);
     }
 };
 
