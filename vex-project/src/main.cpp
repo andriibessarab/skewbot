@@ -25,16 +25,46 @@ const int MAX_BUFFER_SIZE = 100;
 // --- Local Functions Prototypes ---
 void print_status(std::string status);
 std::string get_state_from_serial();
-void FindSolutions(std::string CubeState);
+bool CheckOrientation(const std::string &Orientation);
+std::string FindSolutions(const std::string &CubeState, FILE* file);
+
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 int main()
-{
-    back_motor.spin(fwd, 20, percent);
+{   
+    FILE* file = fopen("SkewSolutions.bin","rb");
+    
+    //back_motor.spin(fwd, 20, percent);
+    
     // Initializing Robot Configuration
     vexcodeInit();
 
-    print_status("Skewb Solver");
+    Brain.Screen.setFont(mono12);
+    print_status("Skewb Solver \n");
+    
+
+    if(!file){
+        Brain.Screen.setCursor(4,1);
+        Brain.Screen.print("Failed to open file");
+        Brain.Screen.setCursor(6,1);
+        Brain.Screen.print(" errno = %d (%s)\n", errno, strerror(errno));
+        return 1;
+    }
+    Brain.Screen.setCursor(5,1);
+    Brain.Screen.print("Opened Successfully");
+    std::string TestString = "BYWOGR UFR UFL UBL UBR DFR DFL DBL DBR";
+    std::string output = FindSolutions(TestString,file);
+    Brain.Screen.setCursor(6,1);
+    Brain.Screen.print("Done: ");
+
+    fclose(file);
+    wait(5,seconds);
+    Brain.programStop();
+    
+
+
+    return 0;
+
 
     // wait(2, seconds);
     // print_status("Awaiting state...");
@@ -98,18 +128,28 @@ std::string get_state_from_serial()
     }
 }
 
-bool CheckOrientation(const std::string &Orientation);
-void FindSolutions(const std::string &CubeState){
-    const int StateSize = 9;
+bool CheckOrientation(const std::string &Orientation){
+    return 0;
+}
+struct State_Solution{
+    uint64_t CurState;
+    uint32_t EncodedSolution;
+};
+
+std::string FindSolutions(const std::string &CubeState, FILE* file){
+    const int8_t StateSize = 9;
+    const int SizeOfBuffer = 300;
+    State_Solution Buffer[SizeOfBuffer];
     std::string State[StateSize];
-    int PrevSubIndex = 0;
-    int IndexToPush = 0;
+    int8_t PrevSubIndex = 0;
+    int8_t IndexToPush = 0;
     bool found = false;
     const char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
     std::string Solution;
     const std::array<std::string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
     const char Moves[8] = {'L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
-    for (int i = 0; i < CubeState.length(); i++){
+    int counter = 0;
+    for (int8_t i = 0; i < CubeState.length(); i++){
         if (CubeState[i] == ' '){
             State[IndexToPush] = CubeState.substr(PrevSubIndex, i-PrevSubIndex);
             PrevSubIndex = i+1;
@@ -121,68 +161,71 @@ void FindSolutions(const std::string &CubeState){
             }
         }
     }
-    FILE* file = fopen("SkewSolutions.bin","rb");
-    if (!file){
-        Brain.Screen.print("Failed To Open SkewSolutions.bin");
-        return;
-    }
     while (!found){
-        uint64_t CurState = 0b0;
+
         std::string centers;
-        size_t Read1 = fread(&CurState, sizeof(CurState), 1, file);
-        uint8_t current = 0b0;
-        bool IsEliminated = false;
-        if (Read1 != 1){
+        size_t ReadCount = fread(Buffer,sizeof(State_Solution),SizeOfBuffer,file);
+        if(ReadCount == 0){
             found = true;
-        }else{
-        for (int i = 0; i < 6; i++) {
-            current = (CurState >> (40 + (i * 3))) & 0b111;
-            if (Centers[current] != State[0][i]){
-                fseek(file,32,SEEK_CUR);
-                IsEliminated = true;
-                //get out of for loop cz no break...
-                i = 6;
+            break;
+        }
+        counter++;
+       
+        if (counter % 100 == 0){
+            Brain.Screen.setCursor(8,1);
+            Brain.Screen.clearLine();
+            Brain.Screen.print(std::to_string(counter).c_str());
+        }
+        for (size_t i = 0; i < ReadCount; i++){
+            uint8_t current = 0b0;
+            bool IsEliminated = false;
+            for (int j = 0; j < 6; j++) {
+                current = (Buffer[i].CurState >> (40 + (j * 3))) & 0b111;
+                if (Centers[current] != State[0][j]){
+                    IsEliminated = true;
+                    //get out of for loop cz no break...
+                    j = 6;
+                }
             }
-        }
-        if(IsEliminated){
-            continue;
-        }
-        for (int i = 0; i < 8; i++) {
-            current = (CurState >> (16 + (i * 3))) & 0b111;
-            if(Corners[current] != State[1+i]){
-                fseek(file,32,SEEK_CUR);
-                IsEliminated = true;
-                //get out of for loop cz no break...
-                i = 8;
+            if(IsEliminated){
+                continue;
             }
-        }
-        if (IsEliminated){
-            continue;
-        }
-        std::string Orienation;
-        for (int i = 0; i < 8; i++) {
-            current = (CurState >> (2 * i)) & 0b11;
-            //convert 0,1,2,3,4,5 -> '0','1'...etc
-            Orienation += '0' + current;
-        }
-        if(CheckOrientation(Orienation)){
-            found = true;
-            uint32_t EncodedSolution = 0b0;
-            size_t ReadSuccessful = fread(&EncodedSolution, sizeof(EncodedSolution), 1, file);
-            if(ReadSuccessful == 1){
-                for (int i = 0; i < 11; i++) {
-                current = (EncodedSolution >> (i * 3)) & 0b111;
+            for (int j = 0; j < 8; j++) {
+                current = (Buffer[i].CurState >> (16 + (j * 3))) & 0b111;
+                if(Corners[current] != State[1+j]){
+                    IsEliminated = true;
+                    //get out of for loop cz no break...
+                    j = 8;
+                }
+            }
+            if (IsEliminated){
+                continue;
+            }
+
+            std::string Orienation;
+            for (int j = 0; j < 8; j++) {
+                current = (Buffer[i].CurState >> (2 * j)) & 0b11;
+                //convert 0,1,2,3,4,5 -> '0','1'...etc
+                Orienation += '0' + current;
+            }
+            if(CheckOrientation(Orienation)){
+                found = true;
+                for (int j = 0; j < 11; j++) {
+                current = (Buffer[i].EncodedSolution >> (j * 3)) & 0b111;
                 Solution += Moves[current];
+            }
+       
+                return Solution;
+            }
         }
+        if (ReadCount != SizeOfBuffer){
+            //Means read to the end of file
+            // i.e. we successfully read 6 entries but size that we tried to read was 16
+            found = true;
         }
-    }else{
-        fseek(file,32,SEEK_CUR);
-    }
-    
-    
-
-
-   
+        
+        
 }
-}
+
+    return Solution;
 }
