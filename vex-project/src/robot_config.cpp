@@ -32,5 +32,8 @@ void initalize_random_seed()
 void vexcode_init(void)
 {
   initalize_random_seed();
+
+  // make font smaller
+  Brain.Screen.setFont(mono12);
 }
 

@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------
 
 #include "state_converter.h"
+#include "robot_config.h"
 
 // --- State Conversion Functions ---
 // Find pos. of WGR corner on scanned config
@@ -115,8 +116,8 @@ std::string flip_orientation(std::string state)
     return state_rotate_x(state_rotate_y(state));
 }
 
-// Normalize scanned state
-std::string normalize_state(std::string state)
+// Move inertial corner to FTR
+std::string normalize_position(std::string state)
 {
     int inert_corner_pos = get_position_of_inertial_corner(state);
     // if inert corner at the bottom, put it up top
@@ -130,19 +131,20 @@ std::string normalize_state(std::string state)
 
     // move inert corner to the FTR spot
     if (inert_corner_pos == 1)
-        state = state_rotate_y(state_rotate_y(state_rotate_y(state)));
+        state = state_rotate_y(state);
     else if (inert_corner_pos == 2)
         state = state_rotate_y(state);
     else if (inert_corner_pos == 3)
-        state = state_rotate_y(state_rotate_y(state));
+        state = state_rotate_y(state_rotate_y(state_rotate_y(state)));
 
-    // it's now in correct pos, but could be facing wrogng way
-    // get orientation and rotate accordingly
-    int inert_corner_orient = get_orientation_of_inertial_corner(state, 0);
-    if (inert_corner_orient == 1)
-        state = flip_orientation(flip_orientation(state));
-    else if (inert_corner_orient == 2)
-        state = flip_orientation(state);
+    // // it's now in correct pos, but could be facing wrogng way
+    // // get orientation and rotate accordingly
+    // int inert_corner_orient = get_orientation_of_inertial_corner(state, 0);
+    // if (inert_corner_orient == 1)
+    //     state = flip_orientation(flip_orientation(state));
+    // else if (inert_corner_orient == 2)
+    //     state = flip_orientation(state);
+
 
     return state;
 }
@@ -173,10 +175,11 @@ skewb_state convert_state_to_struct(const std::string &state)
         char c2 = state[indices[1]];
         char c3 = state[indices[2]];
 
+
         // find which piece
         // order alphabetically and use map
         std::array<char, 3> chars = {c1, c2, c3};
-        std::sort(chars.begin(), chars.end());
+        std::sort(chars.begin(), chars.end()); 
         std::string color_key = "";
         color_key += chars[0];
         color_key += chars[1];
@@ -239,53 +242,85 @@ std::string corner_to_string(CORNER c)
         return "DBL";
     case DBR:
         return "DBR";
+    default:
+        return "?";
     }
-    return "?";
+
 }
 
-std::string skewb_state_to_string(const skewb_state &state)
+std::string skewb_state_to_string(const skewb_state &state, bool include_orientations)
 {
     std::string state_key = "";
 
     // centers
     for (int i = 0; i < state.center_colors.size(); i++)
-    {
         state_key += center_to_string(state.center_colors[i]);
-    }
 
     state_key += " ";
+    
 
     // permutations
     for (int i = 0; i < state.corner_permutations.size(); i++)
-    {
+    {const auto &indices = corners.at(indexes_map.at(i));
+            // --- ADD THIS DEBUGGING CODE ---
+        if (indices[0] >= 30 || indices[1] >= 30 || indices[2] >= 30)
+        {
+            printf("!!!!!!!!! FATAL ERROR: Index out of bounds for corner %d !!!!!!!!!\n", i);
+        }
+        // --- END DEBUGGING CODE ---
         state_key += corner_to_string(state.corner_permutations[i]) + " ";
     }
 
-    state_key += " ";
 
     // orientations
-    for (int i = 0; i < state.corner_permutations.size(); i++)
+    if(include_orientations)
     {
-        CORNER piece_at_position_i = state.corner_permutations[i];
-        state_key += std::to_string(state.corner_orientations.at(piece_at_position_i));
-    }
+        state_key += " ";
 
+        for (int i = 0; i < state.corner_permutations.size(); i++)
+        {
+            CORNER piece_at_position_i = state.corner_permutations[i];
+            state_key += std::to_string(state.corner_orientations.at(piece_at_position_i));
+        }
+
+    }
+    else
+    {
+        // Trim last space
+        state_key = state_key.substr(0, state_key.size() - 1);
+    }
     return state_key;
 }
 
-// --- Needed to Find Solution ---
-bool orientation_matches(std::string normalized_string, std::string needed_orientation)
+// Returns string that can be used to find solution
+// it converts any colour state to element
+// state how it appears in solution file
+std::string find_normalized_stringified_struct(std::string state_string)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        skewb_state state_struct = convert_state_to_struct(normalized_string);
-        std::string state_struct_stringified = skewb_state_to_string(state_struct);
-        //printf("%s %s\n", state_struct_stringified.c_str(), needed_orientation);
-        if (state_struct_stringified.find(needed_orientation) != std::string::npos)
-            return true;
 
-        normalized_string = flip_orientation(normalized_string);
-    }
+    // Normalize state string
+    // this meant UFR corner is in correct spot
+    std::string normalized_state_string =  normalize_position(state_string);
 
-    return false;
+    std::string state_struct_stringified = ""; 
+    std::string ubr_pos_corner = "";
+    bool is_found = false;
+
+    // now let's rotare until UBL corner is in correct spot too
+    do
+    {  
+        skewb_state state_struct = convert_state_to_struct(normalized_state_string);
+
+        state_struct_stringified = skewb_state_to_string(state_struct, true);
+        ubr_pos_corner = state_struct_stringified.substr(15, 3);
+
+        if (ubr_pos_corner == "UBL")
+            is_found = true;
+        else
+            normalized_state_string = flip_orientation(normalized_state_string);
+
+    } while(!is_found);
+
+
+    return state_struct_stringified;
 }
