@@ -164,19 +164,21 @@ struct State_Solution
 std::string FindSolutions(std::string stringified_state_struct, FILE* file)
 {
     // "XXXXXX XXX XXX XXX XXX XXX XXX XXX XXX  YYYYYY"
-    const std::string CubeState = stringified_state_struct.substr(0, 37);
+    const std::string CubeState = stringified_state_struct.substr(0, 38);
     const std::string ToPrint1 = stringified_state_struct.substr(0,19);
     const std::string ToPrint2 = stringified_state_struct.substr(19,18);
 
     const std::string needed_orientation = stringified_state_struct.substr(40, 8);
 
-            Brain.Screen.setCursor(3,1);
-            Brain.Screen.print("%s", ToPrint1.c_str());
-            Brain.Screen.setCursor(4,1);
-            Brain.Screen.print("%s", ToPrint2.c_str());
-            Brain.Screen.setCursor(5,1);
-            Brain.Screen.print("%s", needed_orientation.c_str());
-            wait(20, seconds);
+            // Brain.Screen.setCursor(3,1);
+            // Brain.Screen.print("%s", ToPrint1.c_str());
+            // Brain.Screen.setCursor(4,1);
+            // Brain.Screen.print("%s", ToPrint2.c_str());
+            // Brain.Screen.setCursor(5,1);
+            // Brain.Screen.print("%s", needed_orientation.c_str());
+
+            // wait(10, seconds);
+
 
     static char file_buffer[8192];
     setvbuf(file, file_buffer, _IOFBF, sizeof(file_buffer));
@@ -192,18 +194,28 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
     const std::array<std::string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
     const char Moves[9] = {' ','L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
     int counter = 0;
+    int OrineationNOAMTHCESCOUNTER = 0;
     for (int8_t i = 0; i < CubeState.length(); i++){
         if (CubeState[i] == ' '){
             State[IndexToPush] = CubeState.substr(PrevSubIndex, i-PrevSubIndex);
             PrevSubIndex = i+1;
             IndexToPush++;
+            //Brain.Screen.setCursor(5,i+1);
+            //Brain.Screen.print("%d ",PrevSubIndex);
+
             if (IndexToPush == 8){
+                //Brain.Screen.setCursor(5,i+1);
+                //Brain.Screen.print("%s ",State[i].c_str());
                 State[8] = CubeState.substr(PrevSubIndex);
+                
                 //Get out of for loop cz no break...
                 i = CubeState.length();
             }
         }
     }
+    
+    
+    
     while (!found){
         counter++;
         Brain.Screen.setCursor(9,1);
@@ -214,9 +226,8 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
         }
         
 
-        std::string centers;
-        std::string corners;
-        bool IsEliminated = false;
+        
+        
         size_t ReadCount = fread(Buffer,sizeof(State_Solution),SizeOfBuffer,file);
         if(ReadCount == 0){
             found = true;
@@ -226,20 +237,38 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
        
         
         for (size_t i = 0; i < ReadCount; i++){
-            uint8_t current = 0b0;
+
+            bool IsEliminated = false;
+            std::string centers;
+            std::string corners;
+
+            int current = 0b0;
+            
             for (int j = 0; j < 6; j++) {
                 current = (Buffer[i].CurState >> (40 + (j * 3))) & 0b111;
-                centers+=Centers[current];
+                centers += Centers[current];
                 if (Centers[current] != State[0][j]){
                     IsEliminated = true;
-                    //get out of for loop cz no break...
                     j = 6;
+                    //get out of for loop cz no break...
+
                 }
             }
+            
+            
+            // Brain.Screen.setCursor(5,1);
+            // Brain.Screen.clearLine();
+            // Brain.Screen.print("%s",centers.c_str());
+            // wait(5, seconds);
+
+
             
             if(IsEliminated){
                 continue;
             }
+            
+             
+
             for (int j = 0; j < 8; j++) {
                 current = (Buffer[i].CurState >> (16 + (j * 3))) & 0b111;
                 corners += Corners[current] + " ";
@@ -253,7 +282,7 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
             if (IsEliminated){
                 continue;
             }
-
+            
             std::string Orienation;
             for (int j = 0; j < 8; j++) {
                 current = (Buffer[i].CurState >> (2 * j)) & 0b11;
@@ -261,23 +290,22 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
                 Orienation += '0' + current;
             }
             
-
+           
         
-            Brain.Screen.setCursor(1,1);
-            Brain.Screen.clearLine();
-            Brain.Screen.print(centers.c_str());
-            Brain.Screen.setCursor(2,1);
-            Brain.Screen.clearLine();
-            Brain.Screen.print(corners.c_str());
-            Brain.Screen.setCursor(3,1);
-            Brain.Screen.clearLine();
-            Brain.Screen.print(Orienation.c_str());
+            // Brain.Screen.setCursor(1,1);
+            // Brain.Screen.clearLine();
+            // Brain.Screen.print(centers.c_str());
+            // Brain.Screen.setCursor(2,1);
+            // Brain.Screen.clearLine();
+            // Brain.Screen.print(corners.c_str());
+            // Brain.Screen.setCursor(3,1);
+            // Brain.Screen.clearLine();
+            // Brain.Screen.print(Orienation.c_str());
         
             
             
            
             if(Orienation == needed_orientation){
-                
                 Brain.Screen.setCursor(8,1);
                 Brain.Screen.print(Orienation.c_str());
                 found = true;
@@ -288,7 +316,6 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
                 }
                 Solution += Moves[current];
             }
-                
                 return Solution;
             }
         }
@@ -298,7 +325,6 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
             found = true;
         }
     }
-    
     return Solution;
 }
 
