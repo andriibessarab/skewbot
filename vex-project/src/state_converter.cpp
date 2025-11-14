@@ -130,12 +130,12 @@ std::string normalize_position(std::string state)
     }
 
     // move inert corner to the FTR spot
-    if (inert_corner_pos == 1)
-        state = state_rotate_y(state);
+    if (inert_corner_pos == 3)
+        state = state_rotate_y(state_rotate_y(state));
     else if (inert_corner_pos == 2)
-        state = state_rotate_y(state);
-    else if (inert_corner_pos == 3)
         state = state_rotate_y(state_rotate_y(state_rotate_y(state)));
+    else if (inert_corner_pos == 1)
+        state = state_rotate_y(state);
 
     // // it's now in correct pos, but could be facing wrogng way
     // // get orientation and rotate accordingly
@@ -261,13 +261,8 @@ std::string skewb_state_to_string(const skewb_state &state, bool include_orienta
 
     // permutations
     for (int i = 0; i < state.corner_permutations.size(); i++)
-    {const auto &indices = corners.at(indexes_map.at(i));
-            // --- ADD THIS DEBUGGING CODE ---
-        if (indices[0] >= 30 || indices[1] >= 30 || indices[2] >= 30)
-        {
-            printf("!!!!!!!!! FATAL ERROR: Index out of bounds for corner %d !!!!!!!!!\n", i);
-        }
-        // --- END DEBUGGING CODE ---
+    {
+        const auto &indices = corners.at(indexes_map.at(i));
         state_key += corner_to_string(state.corner_permutations[i]) + " ";
     }
 

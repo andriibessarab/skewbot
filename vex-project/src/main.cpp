@@ -65,7 +65,7 @@ int main()
     Brain.Screen.print("Solution: ");
     Brain.Screen.print(solution.c_str());
   
-    wait (5, seconds);
+    wait (120, seconds);
     
 
     // Wait for touch to start solve
@@ -111,7 +111,7 @@ int main()
 
     // End the program
     print_status("Solved!");
-    wait(10, seconds);
+    wait(120, seconds);
     Brain.programStop();
 }
 
@@ -163,27 +163,16 @@ struct State_Solution
 
 std::string FindSolutions(std::string stringified_state_struct, FILE* file)
 {
-    // "XXXXXX XXX XXX XXX XXX XXX XXX XXX XXX  YYYYYY"
     const std::string CubeState = stringified_state_struct.substr(0, 38);
     const std::string ToPrint1 = stringified_state_struct.substr(0,19);
     const std::string ToPrint2 = stringified_state_struct.substr(19,18);
 
     const std::string needed_orientation = stringified_state_struct.substr(40, 8);
 
-            // Brain.Screen.setCursor(3,1);
-            // Brain.Screen.print("%s", ToPrint1.c_str());
-            // Brain.Screen.setCursor(4,1);
-            // Brain.Screen.print("%s", ToPrint2.c_str());
-            // Brain.Screen.setCursor(5,1);
-            // Brain.Screen.print("%s", needed_orientation.c_str());
-
-            // wait(10, seconds);
-
-
-    static char file_buffer[8192];
+    static char file_buffer[32768];
     setvbuf(file, file_buffer, _IOFBF, sizeof(file_buffer));
     const int8_t StateSize = 9;
-    const int SizeOfBuffer = 64;
+    const int SizeOfBuffer = 256;
     State_Solution Buffer[SizeOfBuffer];
     std::string State[StateSize];
     int8_t PrevSubIndex = 0;
@@ -200,12 +189,8 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
             State[IndexToPush] = CubeState.substr(PrevSubIndex, i-PrevSubIndex);
             PrevSubIndex = i+1;
             IndexToPush++;
-            //Brain.Screen.setCursor(5,i+1);
-            //Brain.Screen.print("%d ",PrevSubIndex);
 
             if (IndexToPush == 8){
-                //Brain.Screen.setCursor(5,i+1);
-                //Brain.Screen.print("%s ",State[i].c_str());
                 State[8] = CubeState.substr(PrevSubIndex);
                 
                 //Get out of for loop cz no break...
@@ -254,12 +239,6 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
 
                 }
             }
-            
-            
-            // Brain.Screen.setCursor(5,1);
-            // Brain.Screen.clearLine();
-            // Brain.Screen.print("%s",centers.c_str());
-            // wait(5, seconds);
 
 
             
@@ -290,17 +269,7 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
                 Orienation += '0' + current;
             }
             
-           
-        
-            // Brain.Screen.setCursor(1,1);
-            // Brain.Screen.clearLine();
-            // Brain.Screen.print(centers.c_str());
-            // Brain.Screen.setCursor(2,1);
-            // Brain.Screen.clearLine();
-            // Brain.Screen.print(corners.c_str());
-            // Brain.Screen.setCursor(3,1);
-            // Brain.Screen.clearLine();
-            // Brain.Screen.print(Orienation.c_str());
+    
         
             
             
@@ -337,5 +306,4 @@ void perform_a_move(custom_motor &m, bool inverted)
     else
         m.spin_degrees(SINGLE_MOVE_ANGLE);
 
-    
 }
