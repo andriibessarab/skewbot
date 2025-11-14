@@ -58,56 +58,58 @@ int main()
     fclose(file);
 
     wait(2, seconds);
-  
-    print_status("Ready!");
-    Brain.Screen.setCursor(8,1);
-    Brain.Screen.clearLine();
-    Brain.Screen.print("Solution: ");
-    Brain.Screen.print(solution.c_str());
-  
-    wait (120, seconds);
-    
-
-    // Wait for touch to start solve
 
     // Check sensory data
 
+    wait(2, seconds);
+
+    // Wait for touch to start solve
+    print_status("Ready!");
+    touch_led.setColor(green);
+    while(!touch_led.pressing())
+    {}
+    while(touch_led.pressing())
+    {}
+    touch_led.setFade(slow);
+    touch_led.setColor(blue);
+
     // Solve
     print_status("Solving...");
-    // for (int i = 0; i < solution.length(); ++i)
-    // {
-    //     char move = solution[i];
 
-    //     switch (move)
-    //     {
-    //         case 'U':
-    //             perform_a_move(back_motor, false);
-    //             break;
-    //         case 'u':
-    //             perform_a_move(back_motor, true);
-    //             break;
-    //         case 'L':
-    //             perform_a_move(left_motor, false);
-    //             break;
-    //         case 'l':
-    //             perform_a_move(left_motor, true);
-    //             break;
-    //         case 'R':
-    //             perform_a_move(right_motor, false);
-    //             break;
-    //         case 'r':
-    //             perform_a_move(right_motor, true);
-    //             break;
-    //         case 'F':
-    //             perform_a_move(top_motor, false);
-    //             break;
-    //         case 'f':
-    //             perform_a_move(top_motor, true);
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
+    for(int i = 0; i < solution.size(); ++i)
+    {
+        char move = solution[i];
+        switch (move)
+        {
+            case 'U':
+                perform_a_move(back_motor, false);
+                break;
+            case 'u':
+                perform_a_move(back_motor, true);
+                break;
+            case 'L':
+                perform_a_move(left_motor, false);
+                break;
+            case 'l':
+                perform_a_move(left_motor, true);
+                break;
+            case 'R':
+                perform_a_move(right_motor, false);
+                break;
+            case 'r':
+                perform_a_move(right_motor, true);
+                break;
+            case 'F':
+                perform_a_move(top_motor, false);
+                break;
+            case 'f':
+                perform_a_move(top_motor, true);
+                break;
+            default:
+                break;
+        }
+        wait(3, seconds);
+    }
 
     // End the program
     print_status("Solved!");
@@ -268,8 +270,6 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
                 //convert 0,1,2,3,4,5 -> '0','1'...etc
                 Orienation += '0' + current;
             }
-            
-    
         
             
             

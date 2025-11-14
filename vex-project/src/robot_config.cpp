@@ -33,7 +33,19 @@ void vexcode_init(void)
 {
   initalize_random_seed();
 
+  //initialize sensors
+  touch_led.setColor(white);
+
   // make font smaller
   Brain.Screen.setFont(mono12);
+
+  top_motor.set_adjustment_degrees_neg(5);
+  top_motor.set_adjustment_degrees_pos(8);
+  left_motor.set_adjustment_degrees_neg(8.5);
+  left_motor.set_adjustment_degrees_pos(8);
+  right_motor.set_adjustment_degrees_neg(6);
+  right_motor.set_adjustment_degrees_pos(9.678);
+  back_motor.set_adjustment_degrees_neg(7);
+  back_motor.set_adjustment_degrees_pos(10);
 }
 

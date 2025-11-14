@@ -19,11 +19,15 @@ struct custom_motor
     const int port_number; 
     motor motor_object;
     double ideal_position; 
+    double adjustment_degrees_neg;
+    double adjustment_degrees_pos;
 
     custom_motor(int port) 
         : port_number(port), 
           motor_object(port),
-          ideal_position(0.0)
+          ideal_position(0.0),
+          adjustment_degrees_neg(0.0),
+          adjustment_degrees_pos(0.0)
     {
         motor_object.resetPosition();                          // reset encoder
         motor_object.setStopping(hold);                        // hold mode
@@ -31,14 +35,29 @@ struct custom_motor
         motor_object.setVelocity(MOTOR_SPEED, percent);        // max velocity that doesn't stall
     }
 
+    void set_adjustment_degrees_neg(int d)
+    {
+        adjustment_degrees_neg = d;
+    }
+
+    void set_adjustment_degrees_pos(int d)
+    {
+        adjustment_degrees_pos = d;
+    }
+        
+
     void spin_degrees(double degrees_to_spin)
     {
         motor_object.resetPosition();
         motor_object.setStopping(hold);                        // hold mode
         motor_object.setMaxTorque(MOTOR_MAX_TORQUE, percent);  // max out torque
         motor_object.setVelocity(MOTOR_SPEED, percent);        // max velocity that doesn't stall
-        // ideal_position += degrees_to_spin;
-        motor_object.spinToPosition(degrees_to_spin, degrees, true);
+
+        if(degrees_to_spin < 0)
+            motor_object.spinToPosition(degrees_to_spin - adjustment_degrees_neg, degrees, true);
+        else
+            motor_object.spinToPosition(degrees_to_spin + adjustment_degrees_pos, degrees, true);
+        
     }
 };
 
