@@ -1,11 +1,24 @@
-import { GlobalSavedValues } from "./DisplaySides"
+import { GlobalSavedValues } from "./DisplaySides";
 
-function SendDataButton(){
+function SendDataButton() {
     // Now it calls the correct function
-    return (<button style={{position:"absolute",right:"50px", top:"50px", width:"10vw",height:"10vh"}} onClick={sendData}>Send Data!</button>)
+    return (
+        <button
+            style={{
+                position: "absolute",
+                right: "50px",
+                top: "50px",
+                width: "10vw",
+                height: "10vh",
+            }}
+            onClick={sendData}
+        >
+            Send Data!
+        </button>
+    );
 }
 
-function SendOverData(){
+function SendOverData() {
     console.log(GlobalSavedValues.flat().join(""));
 }
 
@@ -14,7 +27,7 @@ async function sendData() {
     const url = "/api/send_state";
 
     const payload = {
-        "state": GlobalSavedValues.flat().join("")
+        state: GlobalSavedValues.flat().join(""),
     };
 
     try {
@@ -29,5 +42,5 @@ async function sendData() {
         console.error("Error sending data:", error);
     }
 }
-  
+
 export default SendDataButton;
