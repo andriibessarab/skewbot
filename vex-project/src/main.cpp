@@ -57,13 +57,12 @@ int main()
     std::string solution = FindSolutions(state_struct_stringified, file);
     fclose(file);
 
-    // wait(2, seconds);
+    wait(2, seconds);
 
-    // // Check sensory data
-
-    // wait(2, seconds);
-
+    // Check sensory data
+    wait(2, seconds);
     // Wait for touch to start solve
+    
     print_status("Ready!");
     touch_led.setColor(green);
     while (!touch_led.pressing())
@@ -80,41 +79,57 @@ int main()
 
     for (int i = 0; i < solution.size(); ++i)
     {
+        
+        top_motor.stop();
+        left_motor.stop();
+        right_motor.stop();
+        back_motor.stop();
         char move = solution[i];
+        Brain.Screen.setCursor(5, 1);
+        Brain.Screen.clearLine();
+        Brain.Screen.print("Move: %c   ", move);
         switch (move)
         {
+   
+
         case 'U':
-            perform_a_move(back_motor, false);
-            break;
-        case 'u':
             perform_a_move(back_motor, true);
             break;
-        case 'L':
-            perform_a_move(left_motor, false);
+        case 'u':
+            perform_a_move(back_motor, false);
             break;
-        case 'l':
+        case 'L':
             perform_a_move(left_motor, true);
             break;
-        case 'R':
-            perform_a_move(right_motor, false);
+        case 'l':
+            perform_a_move(left_motor, false);
             break;
-        case 'r':
+        case 'R':
             perform_a_move(right_motor, true);
             break;
+        case 'r':
+            perform_a_move(right_motor, false);
+            break;
         case 'F':
-            perform_a_move(top_motor, false);
+            perform_a_move(top_motor, true);
+            top_motor.PrintPosition();
             break;
         case 'f':
-            perform_a_move(top_motor, true);
+            perform_a_move(top_motor, false);
+            top_motor.PrintPosition();
             break;
         default:
             break;
         }
     }
+    top_motor.stop();
+    left_motor.stop();
+    right_motor.stop();
+    back_motor.stop();
 
     // End the program
     print_status("Solved!");
-    wait(120, seconds);
+    wait(20, seconds);
     Brain.programStop();
 }
 
@@ -304,7 +319,7 @@ std::string FindSolutions(std::string stringified_state_struct, FILE *file)
 void perform_a_move(custom_motor &m, bool inverted)
 {
     if (inverted)
-        m.spin_motor(80, true);
+        m.spin_motor(100, true);
     else
-        m.spin_motor(80, false);
+        m.spin_motor(100, false);
 }
