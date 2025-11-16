@@ -23,7 +23,7 @@ const int MAX_BUFFER_SIZE = 100;
 // --- Local Functions Prototypes ---
 void print_status(std::string status);
 std::string get_state_from_serial();
-std::string FindSolutions(std::string stringified_state_struct, FILE* file);
+std::string FindSolutions(std::string stringified_state_struct, FILE *file);
 void perform_a_move(custom_motor &m, bool inverted);
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
@@ -32,16 +32,16 @@ int main()
 {
     // Configure robot
     vexcode_init();
-  
+
     // Open file
-    FILE* file = fopen("SkewSolutions.bin", "rb");
+    FILE *file = fopen("SkewSolutions.bin", "rb");
     if (!file)
     {
         print_status("Couldn't open file. Aborting...");
         wait(10, seconds);
         Brain.programStop();
     }
-  
+
     // Get state from serial
     print_status("Awaiting data...");
     std::string raw_state_string = get_state_from_serial();
@@ -57,58 +57,59 @@ int main()
     std::string solution = FindSolutions(state_struct_stringified, file);
     fclose(file);
 
-    wait(2, seconds);
+    // wait(2, seconds);
 
-    // Check sensory data
+    // // Check sensory data
 
-    wait(2, seconds);
+    // wait(2, seconds);
 
     // Wait for touch to start solve
     print_status("Ready!");
     touch_led.setColor(green);
-    while(!touch_led.pressing())
-    {}
-    while(touch_led.pressing())
-    {}
+    while (!touch_led.pressing())
+    {
+    }
+    while (touch_led.pressing())
+    {
+    }
     touch_led.setFade(slow);
     touch_led.setColor(blue);
 
     // Solve
     print_status("Solving...");
 
-    for(int i = 0; i < solution.size(); ++i)
+    for (int i = 0; i < solution.size(); ++i)
     {
         char move = solution[i];
         switch (move)
         {
-            case 'U':
-                perform_a_move(back_motor, false);
-                break;
-            case 'u':
-                perform_a_move(back_motor, true);
-                break;
-            case 'L':
-                perform_a_move(left_motor, false);
-                break;
-            case 'l':
-                perform_a_move(left_motor, true);
-                break;
-            case 'R':
-                perform_a_move(right_motor, false);
-                break;
-            case 'r':
-                perform_a_move(right_motor, true);
-                break;
-            case 'F':
-                perform_a_move(top_motor, false);
-                break;
-            case 'f':
-                perform_a_move(top_motor, true);
-                break;
-            default:
-                break;
+        case 'U':
+            perform_a_move(back_motor, false);
+            break;
+        case 'u':
+            perform_a_move(back_motor, true);
+            break;
+        case 'L':
+            perform_a_move(left_motor, false);
+            break;
+        case 'l':
+            perform_a_move(left_motor, true);
+            break;
+        case 'R':
+            perform_a_move(right_motor, false);
+            break;
+        case 'r':
+            perform_a_move(right_motor, true);
+            break;
+        case 'F':
+            perform_a_move(top_motor, false);
+            break;
+        case 'f':
+            perform_a_move(top_motor, true);
+            break;
+        default:
+            break;
         }
-        wait(3, seconds);
     }
 
     // End the program
@@ -147,11 +148,11 @@ std::string get_state_from_serial()
             // --- THIS IS THE FIX ---
             // fgets returned NULL (EOF or error).
             // We must stop looping and return to main().
-            
+
             // Return an empty string to signal an error.
-            return ""; 
+            return "";
         }
-        
+
         // This wait is only hit if fgets got an empty line
         wait(20, msec);
     }
@@ -163,11 +164,11 @@ struct State_Solution
     uint64_t EncodedSolution;
 };
 
-std::string FindSolutions(std::string stringified_state_struct, FILE* file)
+std::string FindSolutions(std::string stringified_state_struct, FILE *file)
 {
     const std::string CubeState = stringified_state_struct.substr(0, 38);
-    const std::string ToPrint1 = stringified_state_struct.substr(0,19);
-    const std::string ToPrint2 = stringified_state_struct.substr(19,18);
+    const std::string ToPrint1 = stringified_state_struct.substr(0, 19);
+    const std::string ToPrint2 = stringified_state_struct.substr(19, 18);
 
     const std::string needed_orientation = stringified_state_struct.substr(40, 8);
 
@@ -183,114 +184,117 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
     const char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
     std::string Solution;
     const std::array<std::string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
-    const char Moves[9] = {' ','L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
+    const char Moves[9] = {' ', 'L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
     int counter = 0;
     int OrineationNOAMTHCESCOUNTER = 0;
-    for (int8_t i = 0; i < CubeState.length(); i++){
-        if (CubeState[i] == ' '){
-            State[IndexToPush] = CubeState.substr(PrevSubIndex, i-PrevSubIndex);
-            PrevSubIndex = i+1;
+    for (int8_t i = 0; i < CubeState.length(); i++)
+    {
+        if (CubeState[i] == ' ')
+        {
+            State[IndexToPush] = CubeState.substr(PrevSubIndex, i - PrevSubIndex);
+            PrevSubIndex = i + 1;
             IndexToPush++;
 
-            if (IndexToPush == 8){
+            if (IndexToPush == 8)
+            {
                 State[8] = CubeState.substr(PrevSubIndex);
-                
-                //Get out of for loop cz no break...
+
+                // Get out of for loop cz no break...
                 i = CubeState.length();
             }
         }
     }
-    
-    
-    
-    while (!found){
+
+    while (!found)
+    {
         counter++;
-        Brain.Screen.setCursor(9,1);
-       
-        if (counter % 1000 == 0){
+        Brain.Screen.setCursor(9, 1);
+
+        if (counter % 1000 == 0)
+        {
             Brain.Screen.clearLine();
             Brain.Screen.print(std::to_string(counter).c_str());
         }
-        
 
-        
-        
-        size_t ReadCount = fread(Buffer,sizeof(State_Solution),SizeOfBuffer,file);
-        if(ReadCount == 0){
+        size_t ReadCount = fread(Buffer, sizeof(State_Solution), SizeOfBuffer, file);
+        if (ReadCount == 0)
+        {
             found = true;
             break;
         }
-        
-       
-        
-        for (size_t i = 0; i < ReadCount; i++){
+
+        for (size_t i = 0; i < ReadCount; i++)
+        {
 
             bool IsEliminated = false;
             std::string centers;
             std::string corners;
 
             int current = 0b0;
-            
-            for (int j = 0; j < 6; j++) {
+
+            for (int j = 0; j < 6; j++)
+            {
                 current = (Buffer[i].CurState >> (40 + (j * 3))) & 0b111;
                 centers += Centers[current];
-                if (Centers[current] != State[0][j]){
+                if (Centers[current] != State[0][j])
+                {
                     IsEliminated = true;
                     j = 6;
-                    //get out of for loop cz no break...
-
+                    // get out of for loop cz no break...
                 }
             }
 
-
-            
-            if(IsEliminated){
+            if (IsEliminated)
+            {
                 continue;
             }
-            
-             
 
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 8; j++)
+            {
                 current = (Buffer[i].CurState >> (16 + (j * 3))) & 0b111;
                 corners += Corners[current] + " ";
-                if(Corners[current] != State[1+j]){
+                if (Corners[current] != State[1 + j])
+                {
                     IsEliminated = true;
-                    //get out of for loop cz no break...
+                    // get out of for loop cz no break...
                     j = 8;
                 }
             }
-          
-            if (IsEliminated){
+
+            if (IsEliminated)
+            {
                 continue;
             }
-            
+
             std::string Orienation;
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 8; j++)
+            {
                 current = (Buffer[i].CurState >> (2 * j)) & 0b11;
-                //convert 0,1,2,3,4,5 -> '0','1'...etc
+                // convert 0,1,2,3,4,5 -> '0','1'...etc
                 Orienation += '0' + current;
             }
-        
-            
-            
-           
-            if(Orienation == needed_orientation){
-                Brain.Screen.setCursor(8,1);
+
+            if (Orienation == needed_orientation)
+            {
+                Brain.Screen.setCursor(8, 1);
                 Brain.Screen.print(Orienation.c_str());
                 found = true;
-                for (int j = 0; j < 11; j++) {
-                current = (Buffer[i].EncodedSolution >> (j * 4)) & 0b1111;
-                if (current == 0){
-                    break;
+                for (int j = 0; j < 11; j++)
+                {
+                    current = (Buffer[i].EncodedSolution >> (j * 4)) & 0b1111;
+                    if (current == 0)
+                    {
+                        break;
+                    }
+                    Solution += Moves[current];
                 }
-                Solution += Moves[current];
-            }
                 return Solution;
             }
         }
-        if (ReadCount != SizeOfBuffer){
-            //Means read to the end of file
-            // i.e. we successfully read 6 entries but size that we tried to read was 16
+        if (ReadCount != SizeOfBuffer)
+        {
+            // Means read to the end of file
+            //  i.e. we successfully read 6 entries but size that we tried to read was 16
             found = true;
         }
     }
@@ -299,11 +303,8 @@ std::string FindSolutions(std::string stringified_state_struct, FILE* file)
 
 void perform_a_move(custom_motor &m, bool inverted)
 {
-    const double SINGLE_MOVE_ANGLE = 120.00;
-
-    if(inverted)
-        m.spin_degrees(-SINGLE_MOVE_ANGLE);
+    if (inverted)
+        m.spin_motor(80, true);
     else
-        m.spin_degrees(SINGLE_MOVE_ANGLE);
-
+        m.spin_motor(80, false);
 }
