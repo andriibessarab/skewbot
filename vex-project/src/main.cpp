@@ -24,16 +24,37 @@ const int MAX_BUFFER_SIZE = 100;
 void print_status(std::string status);
 std::string get_state_from_serial();
 std::string FindSolutions(std::string stringified_state_struct, FILE *file);
-void perform_a_move(custom_motor &m, bool inverted);
+void perform_a_move(custom_motor &m, bool inverted, bool &emergency_stop);
+
+void start_solve(){
+    touch_led.setColor(red);
+    optical_sensor.setLightPower(100);
+    optical_sensor.setLight(ledState::on);
+    while(  (optical_sensor.hue()<350 && optical_sensor.hue()>10) ||
+            distance_sensor.objectDistance(mm) > 37 || distance_sensor.objectDistance(mm) < 33
+        ){}
+    optical_sensor.setLight(ledState::off);
+    touch_led.setColor(green);
+    while (!touch_led.pressing())
+    {
+    }
+    while (touch_led.pressing())
+    {
+    }
+    touch_led.setFade(slow);
+    touch_led.setColor(blue);
+}
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 
 int main()
 {
+    bool emergency_stop = false;
+    int move_counter = 0;
     // Configure robot
     vexcode_init();
-
     // Open file
+    /*
     FILE *file = fopen("SkewSolutions.bin", "rb");
     if (!file)
     {
@@ -58,33 +79,26 @@ int main()
     fclose(file);
 
     wait(2, seconds);
-
+    */
     // Check sensory data
     wait(2, seconds);
     // Wait for touch to start solve
     
+    
+    start_solve();
     print_status("Ready!");
-    touch_led.setColor(green);
-    while (!touch_led.pressing())
-    {
-    }
-    while (touch_led.pressing())
-    {
-    }
-    touch_led.setFade(slow);
-    touch_led.setColor(blue);
-
     // Solve
     print_status("Solving...");
-
-    for (int i = 0; i < solution.size(); ++i)
+    std::string solution = "URuFLU";
+    //for (int i = 0; i < solution.size(); ++i)
+    while(move_counter<solution.size() && !emergency_stop)
     {
         
         top_motor.stop();
         left_motor.stop();
         right_motor.stop();
         back_motor.stop();
-        char move = solution[i];
+        char move = solution[move_counter];
         Brain.Screen.setCursor(5, 1);
         Brain.Screen.clearLine();
         Brain.Screen.print("Move: %c   ", move);
@@ -93,34 +107,35 @@ int main()
    
 
         case 'U':
-            perform_a_move(back_motor, true);
+            perform_a_move(back_motor, true, emergency_stop);
             break;
         case 'u':
-            perform_a_move(back_motor, false);
+            perform_a_move(back_motor, false, emergency_stop);
             break;
         case 'L':
-            perform_a_move(left_motor, true);
+            perform_a_move(left_motor, true, emergency_stop);
             break;
         case 'l':
-            perform_a_move(left_motor, false);
+            perform_a_move(left_motor, false, emergency_stop);
             break;
         case 'R':
-            perform_a_move(right_motor, true);
+            perform_a_move(right_motor, true, emergency_stop);
             break;
         case 'r':
-            perform_a_move(right_motor, false);
+            perform_a_move(right_motor, false, emergency_stop);
             break;
         case 'F':
-            perform_a_move(top_motor, true);
+            perform_a_move(top_motor, true, emergency_stop);
             top_motor.PrintPosition();
             break;
         case 'f':
-            perform_a_move(top_motor, false);
+            perform_a_move(top_motor, false, emergency_stop);
             top_motor.PrintPosition();
             break;
         default:
             break;
         }
+        move_counter++;
     }
     top_motor.stop();
     left_motor.stop();
@@ -128,7 +143,14 @@ int main()
     back_motor.stop();
 
     // End the program
-    print_status("Solved!");
+    if(emergency_stop == true)
+    {
+        print_status("Aborted");
+    }
+    else
+    {
+        print_status("Solved!");
+    }
     wait(20, seconds);
     Brain.programStop();
 }
@@ -316,10 +338,10 @@ std::string FindSolutions(std::string stringified_state_struct, FILE *file)
     return Solution;
 }
 
-void perform_a_move(custom_motor &m, bool inverted)
+void perform_a_move(custom_motor &m, bool inverted, bool &emergency_stop)
 {
     if (inverted)
-        m.spin_motor(100, true);
+        m.spin_motor(100, true, emergency_stop);
     else
-        m.spin_motor(100, false);
+        m.spin_motor(100, false, emergency_stop);
 }

@@ -1,11 +1,11 @@
 #pragma once
 #include "vex.h"
 
-
 using namespace vex;
 
 const int MOTOR_SPEED = 80;       //%
 const int MOTOR_MAX_TORQUE = 100; //%
+const int HEADING_TOLERANCE = 5;
 
 const int TOP_MOTOR_PORT = PORT5;
 const int LEFT_MOTOR_PORT = PORT1;
@@ -47,6 +47,15 @@ struct custom_motor
         Brain.Screen.setCursor(6,1);
         Brain.Screen.clearLine();
         Brain.Screen.print(" Pos: %.6f", motor_object.position(degrees));
+    }
+
+    bool is_corner_aligned(){
+        if(fabs(fmod(motor_object.position(degrees), 120) - 120) < HEADING_TOLERANCE){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     double PID_Step(double setpoint, double meas, double dt, int min, int max, bool resetPI)
@@ -98,7 +107,7 @@ struct custom_motor
 
     // True: CW 90°
     // False: CCW 90°
-    void spin_motor(int motorPower, bool dir)
+    void spin_motor(int motorPower, bool dir, bool &emergency_stop)
     {
         PID_Step(0, 0, 0, 0, 0, true);
 
@@ -118,6 +127,8 @@ struct custom_motor
         bool reachedTarget = false;
 
         double targetAngle = dir ? ANGLE : -ANGLE;
+
+        float time1; //for emergency stop
 
         while (!reachedTarget)
         {
@@ -150,7 +161,15 @@ struct custom_motor
                 {
                     motor_object.spin(reverse);
                 }
-
+                // time1 = Brain.Timer.value();
+                // while(time1 + period_ms <= Brain.Timer.value() && !emergency_stop)
+                // {
+                //     if(touch_led.pressing())
+                //     {
+                //         emergency_stop = true;
+                //         reachedTarget = true;
+                //     }
+                // }
                 wait(period_ms, msec);
             }
         }
