@@ -19,6 +19,10 @@ using namespace vex;
 
 // --- Constants ---
 const int MAX_BUFFER_SIZE = 100;
+const int CUBE_UPPER_DISTANCE = 40;
+const int CUBE_LOWER_DISTANCE = 34;
+const int ORANGE_UPPER_LIMIT = 350;
+const int ORANGE_LOWER_LIMIT = 10;
 
 // --- Local Functions Prototypes ---
 void print_status(std::string status);
@@ -27,20 +31,31 @@ std::string FindSolutions(std::string stringified_state_struct, FILE *file);
 void perform_a_move(custom_motor &m, bool inverted, bool &emergency_stop);
 
 void start_solve(){
+    vex::color led_color = red;
+
     touch_led.setColor(red);
     optical_sensor.setLightPower(100);
     optical_sensor.setLight(ledState::on);
-    while(  (optical_sensor.hue()<350 && optical_sensor.hue()>10) ||
-            distance_sensor.objectDistance(mm) > 37 || distance_sensor.objectDistance(mm) < 33
-        ){}
-    optical_sensor.setLight(ledState::off);
-    touch_led.setColor(green);
-    while (!touch_led.pressing())
+    while (!touch_led.pressing() || led_color == red)
     {
+        if((optical_sensor.hue()<ORANGE_UPPER_LIMIT &&
+            optical_sensor.hue()>ORANGE_LOWER_LIMIT) ||
+            distance_sensor.objectDistance(mm) > CUBE_UPPER_DISTANCE ||
+            distance_sensor.objectDistance(mm) < CUBE_LOWER_DISTANCE)
+        {
+            led_color = red;
+        }
+        else
+        {
+            led_color = green;
+        }
+        touch_led.setColor(led_color);
     }
     while (touch_led.pressing())
     {
     }
+    optical_sensor.setLight(ledState::off);
+
     touch_led.setFade(slow);
     touch_led.setColor(blue);
 }
@@ -54,7 +69,7 @@ int main()
     // Configure robot
     vexcode_init();
     // Open file
-    /*
+    
     FILE *file = fopen("SkewSolutions.bin", "rb");
     if (!file)
     {
@@ -79,7 +94,7 @@ int main()
     fclose(file);
 
     wait(2, seconds);
-    */
+    
     // Check sensory data
     wait(2, seconds);
     // Wait for touch to start solve
@@ -89,8 +104,7 @@ int main()
     print_status("Ready!");
     // Solve
     print_status("Solving...");
-    std::string solution = "URuFLU";
-    //for (int i = 0; i < solution.size(); ++i)
+
     while(move_counter<solution.size() && !emergency_stop)
     {
         
@@ -145,7 +159,8 @@ int main()
     // End the program
     if(emergency_stop == true)
     {
-        print_status("Aborted");
+        print_status("Manually Aborted");
+        touch_led.setColor(red);
     }
     else
     {

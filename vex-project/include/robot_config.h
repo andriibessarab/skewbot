@@ -161,16 +161,12 @@ struct custom_motor
                 {
                     motor_object.spin(reverse);
                 }
-                // time1 = Brain.Timer.value();
-                // while(time1 + period_ms <= Brain.Timer.value() && !emergency_stop)
-                // {
-                //     if(touch_led.pressing())
-                //     {
-                //         emergency_stop = true;
-                //         reachedTarget = true;
-                //     }
-                // }
                 wait(period_ms, msec);
+                if(touch_led.pressing())
+                {
+                    emergency_stop = true;
+                    reachedTarget = true;
+                }
             }
         }
     }
