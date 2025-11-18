@@ -6,6 +6,7 @@
 #include <array>
 #include <algorithm>
 #include <cstring>
+#include "robot_config.h"
 
 // --- Skewb State Representation ---
 enum CENTER { W, G, O, B, R, Y };

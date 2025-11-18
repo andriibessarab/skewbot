@@ -7,6 +7,8 @@
 #include <string.h>
 #include <math.h>
 #include <array>
+#include <string>
+#include <cstdio> 
 #include "iq2_cpp.h"
 
 #endif

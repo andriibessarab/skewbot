@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------
 //
 //  Module:       state_converter.cpp
-//  Description:  Initializing sensors and default vex stuff
+//  Description:  Everything needed to convert colour string to
+//                stringified struct in correct orientation.
 //
 //----------------------------------------------------------------------------
 
 #include "state_converter.h"
-#include "robot_config.h"
 
 // --- State Conversion Functions ---
 // Find pos. of WGR corner on scanned config
@@ -262,7 +262,6 @@ std::string skewb_state_to_string(const skewb_state &state, bool include_orienta
     // permutations
     for (int i = 0; i < state.corner_permutations.size(); i++)
     {
-        const auto &indices = corners.at(indexes_map.at(i));
         state_key += corner_to_string(state.corner_permutations[i]) + " ";
     }
 
