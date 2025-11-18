@@ -24,7 +24,7 @@ const int MAX_BUFFER_SIZE = 100;
 void print_status(std::string status);
 std::string get_state_from_serial();
 std::string FindSolutions(std::string stringified_state_struct, FILE *file);
-void perform_a_move(custom_motor &m, bool inverted);
+void perform_a_move(custom_motor &m, bool inverted,bool IsTop);
 
 /////////////////////////////// MAIN PROGRAM ///////////////////////////////
 
@@ -34,34 +34,35 @@ int main()
     vexcode_init();
 
     // Open file
-    FILE *file = fopen("SkewSolutions.bin", "rb");
-    if (!file)
-    {
-        print_status("Couldn't open file. Aborting...");
-        wait(10, seconds);
-        Brain.programStop();
-    }
+    // FILE *file = fopen("SkewSolutions.bin", "rb");
+    // if (!file)
+    // {
+    //     print_status("Couldn't open file. Aborting...");
+    //     wait(10, seconds);
+    //     Brain.programStop();
+    // }
 
-    // Get state from serial
-    print_status("Awaiting data...");
-    std::string raw_state_string = get_state_from_serial();
+    // // Get state from serial
+    // print_status("Awaiting data...");
+    // std::string raw_state_string = get_state_from_serial();
 
-    // Process state
-    print_status("Processing...");
-    std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
+    // // Process state
+    // print_status("Processing...");
+    // std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    wait(2, seconds);
+    // wait(2, seconds);
 
-    // Obtain solution
-    print_status("Searching...");
-    std::string solution = FindSolutions(state_struct_stringified, file);
-    fclose(file);
+    // // Obtain solution
+    // print_status("Searching...");
+    // std::string solution = FindSolutions(state_struct_stringified, file);
+    // fclose(file);
 
-    wait(2, seconds);
+    // wait(2, seconds);
 
-    // Check sensory data
-    wait(2, seconds);
-    // Wait for touch to start solve
+    // // Check sensory data
+    // wait(2, seconds);
+    // // Wait for touch to start solve
+    std::string solution = "RlFuFRLUFUr";
     
     print_status("Ready!");
     touch_led.setColor(green);
@@ -85,37 +86,34 @@ int main()
         right_motor.stop();
         back_motor.stop();
         char move = solution[i];
-        Brain.Screen.setCursor(5, 1);
-        Brain.Screen.clearLine();
-        Brain.Screen.print("Move: %c   ", move);
         switch (move)
         {
    
 
         case 'U':
-            perform_a_move(back_motor, true);
+            perform_a_move(back_motor, true, false);
             break;
         case 'u':
-            perform_a_move(back_motor, false);
+            perform_a_move(back_motor, false, false);
             break;
         case 'L':
-            perform_a_move(left_motor, true);
+            perform_a_move(left_motor, true,false);
             break;
         case 'l':
-            perform_a_move(left_motor, false);
+            perform_a_move(left_motor, false,false);
             break;
         case 'R':
-            perform_a_move(right_motor, true);
+            perform_a_move(right_motor, true,false);
             break;
         case 'r':
-            perform_a_move(right_motor, false);
+            perform_a_move(right_motor, false,false);
             break;
         case 'F':
-            perform_a_move(top_motor, true);
+            perform_a_move(top_motor, true,true);
             top_motor.PrintPosition();
             break;
         case 'f':
-            perform_a_move(top_motor, false);
+            perform_a_move(top_motor, false,true);
             top_motor.PrintPosition();
             break;
         default:
@@ -316,10 +314,11 @@ std::string FindSolutions(std::string stringified_state_struct, FILE *file)
     return Solution;
 }
 
-void perform_a_move(custom_motor &m, bool inverted)
+void perform_a_move(custom_motor &m, bool inverted, bool IsTop)
 {
     if (inverted)
-        m.spin_motor(100, true);
+        m.spin_motor(100, true, IsTop);
+       
     else
-        m.spin_motor(100, false);
+        m.spin_motor(100, false, IsTop);
 }
