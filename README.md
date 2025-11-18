@@ -1,6 +1,6 @@
 # Skewb Solving Robot
 
-<img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/ca0358dc36826068cd31de5e296ce51176b3d9ff_skewb_camera_solidworks_viewport.png" width="400" />
+<img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/718c56fadf55aff0584a48e703dd623964b8b476_skewbot.png" width="400" />
 
 ## Purpose
 
