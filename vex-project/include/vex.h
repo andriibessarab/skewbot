@@ -9,6 +9,8 @@
 #include <array>
 #include <string>
 #include <cstdio> 
+#include <map>
+#include <vector>
 #include "iq2_cpp.h"
 
 #endif

@@ -11,6 +11,7 @@
 #include "serial_io.h"
 #include "solution_finder.h"
 #include "misc_functions.h"
+#include "sensor_validation.h"
 
 using namespace vex;
 
@@ -36,8 +37,6 @@ int main()
     print_status("Processing...");
     std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    printf("\n\n%s\n\n", state_struct_stringified.c_str());
-
     wait(2, seconds);
 
     // Obtain solution
@@ -47,19 +46,20 @@ int main()
 
     wait(2, seconds);
 
-    // Check sensory data
-    wait(2, seconds);
-    // Wait for touch to start solve
+    // Use sensor to validate cube placement
+    // loops until valid
+    char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+    validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
+    wait(2, seconds);
+
+    // Wait for touch to start solve
     print_status("Ready!");
-    touch_led.setColor(green);
+    touch_led.setColor(white);
     while (!touch_led.pressing())
-    {
-    }
+    {}
     while (touch_led.pressing())
-    {
-    }
-    touch_led.setFade(slow);
+    {}
     touch_led.setColor(blue);
 
     // Solve
@@ -75,8 +75,6 @@ int main()
         char move = solution[i];
         switch (move)
         {
-   
-
         case 'U':
             perform_a_move(back_motor, true, false);
             break;
@@ -113,6 +111,7 @@ int main()
     back_motor.stop();
 
     // End the program
+    touch_led.setColor(green);
     print_status("Solved!");
     wait(20, seconds);
     Brain.programStop();

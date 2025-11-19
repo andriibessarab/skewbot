@@ -34,7 +34,10 @@ void vexcode_init(void)
   initalize_random_seed();
 
   // initialize sensors
-  touch_led.setColor(white);
+  touch_led.setFade(slow);
+  optical_sensor.setLightPower(100);
+  
+  optical_sensor.setLight(ledState::on);
 
   // make font smaller
   Brain.Screen.setFont(mono12);
