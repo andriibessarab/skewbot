@@ -1,6 +1,6 @@
 # Skewb Solving Robot
 
-<img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/718c56fadf55aff0584a48e703dd623964b8b476_skewbot.png" width="400" />
+<img src="https://firebasestorage.googleapis.com/v0/b/adamturaj-projects.appspot.com/o/Skewbot.png?alt=media&token=d9e300c2-7d41-45e1-88ac-7afd7f9618ee" width="400" />
 
 ## Purpose
 
