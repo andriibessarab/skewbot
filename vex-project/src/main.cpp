@@ -59,7 +59,7 @@ int main()
     validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
     wait(2, seconds);
-    // std::string solution = "FULRLFLFULFULFURLURLUFLUFLULRULFULURLUFLURLUFLUF";// "lFuLuFlFuluFlFulfuLuFlFulfuLuFuLuFlF";
+    // std::string solution = "uFL";// "lFuLuFlFuluFlFulfuLuFlFulfuLuFuLuFlF";
 
     // Wait for touch to start solve
     print_status("Ready!");
@@ -83,29 +83,25 @@ int main()
                 back_motor.move_relative(TURN_ANGLE);
                 break;
             case 'u':
-                back_motor.move_relative(TURN_ANGLE);
-                back_motor.move_relative(TURN_ANGLE);
+                back_motor.move_relative(-TURN_ANGLE);
                 break;
             case 'L':
                 left_motor.move_relative(TURN_ANGLE);
                 break;
             case 'l':
-                left_motor.move_relative(TURN_ANGLE);
-                left_motor.move_relative(TURN_ANGLE);
+                left_motor.move_relative(-TURN_ANGLE);
                 break;
             case 'R':
                 right_motor.move_relative(TURN_ANGLE);
                 break;
             case 'r':
-                right_motor.move_relative(TURN_ANGLE);
-                right_motor.move_relative(TURN_ANGLE);
+                right_motor.move_relative(-TURN_ANGLE);
                 break;
             case 'F':
                 top_motor.move_relative(TURN_ANGLE);
                 break;
             case 'f': 
-                top_motor.move_relative(TURN_ANGLE);
-                top_motor.move_relative(TURN_ANGLE);
+                top_motor.move_relative(-TURN_ANGLE);
                 break;
             default:
                 break;
@@ -115,10 +111,16 @@ int main()
     }
 
     // End the program
-    const double time = Brain.Timer.value() / 1000;
     touch_led.setColor(green);
-    std::string final_messsage = "Solved in " + std::to_string(static_cast<int>(time)) + " seconds";
-    print_status(final_messsage);
+    const double time = Brain.Timer.time() / 1000;
+    char final_message_c_style[64] = {};
+    // Brain.Screen.setCursor(2,2);
+    // Brain.Screen.clearLine();
+    // Brain.Screen.print("Solved in %.3f",time);
+    sprintf(final_message_c_style, "Solved in %.3f seconds", time); // have to do it c style :(
+
+    std::string final_message = final_message_c_style;
+    print_status(final_message);
     wait(20, seconds);
     Brain.programStop();
 }

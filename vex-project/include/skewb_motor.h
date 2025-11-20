@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //
 //  Module:       skewb_motor.h
-//  Description:  Header class with PID for motors.
+//  Description:  Header class with separate PID for CW and CCW.
 //  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
@@ -22,7 +22,13 @@ class skewb_motor
 private:
     motor motor_object;
 
-    double Kp = 0, Ki = 0, Kd = 0;
+    // CW
+    double Kp_cw = 0, Ki_cw = 0, Kd_cw = 0;
+    // CCW
+    double Kp_ccw = 0, Ki_ccw = 0, Kd_ccw = 0;
+    // Active
+    double active_Kp = 0, active_Ki = 0, active_Kd = 0;
+
     double integral = 0.0;
     double prev_position = 0.0;
     double target_position = 0.0;
@@ -42,7 +48,7 @@ private:
             integral = 0; 
         
         // cap integral
-        double integral_term = integral * Ki;
+        double integral_term = integral * active_Ki;
         if (integral_term > MAX_INTEGRAL)
             integral_term = MAX_INTEGRAL;
         if (integral_term < -MAX_INTEGRAL)
@@ -52,17 +58,19 @@ private:
         double derivative = current_position - prev_position;
         prev_position = current_position;
 
-        // generate output
-        double output = (Kp * error) + integral_term - (Kd * derivative);
+        // generate output using ACTIVE constants
+        double output = (active_Kp * error) + integral_term - (active_Kd * derivative);
         
         // clamp
-        if (output > 100.0) output = 100.0;
-        if (output < -100.0) output = -100.0;
+        if (output > 100.0)
+            output = 100.0;
+        if (output < -100.0)
+            output = -100.0;
 
         return output;
     }
 
-    // execut actual move using pid
+    // execute actual move using pid
     void execute_move() {
         const int dt_ms = 10; 
         bool settled = false;
@@ -71,6 +79,19 @@ private:
         const int MAX_TIMEOUT = 500; 
 
         prev_position = motor_object.position(degrees);
+
+        // Check direction to use correct pid
+        if (target_position >= prev_position) {
+            // Moving Positive (Clockwise)
+            active_Kp = Kp_cw;
+            active_Ki = Ki_cw;
+            active_Kd = Kd_cw;
+        } else {
+            // Moving Negative (Counter-Clockwise)
+            active_Kp = Kp_ccw;
+            active_Ki = Ki_ccw;
+            active_Kd = Kd_ccw;
+        }
 
         while (!settled && timeout_counter < MAX_TIMEOUT)
         {
@@ -81,7 +102,7 @@ private:
 
             motor_object.spin(forward, velocity_percent, percent);
 
-            // onlyc consider settled when no error
+            // only consider settled when no error
             if (fabs(error) <= TOLERANCE && fabs(motor_object.velocity(dps)) < 2)
                 settled_count++;
             else
@@ -98,20 +119,28 @@ private:
     }
 
 public:
-    skewb_motor(int port, double p, double i, double d)
+    skewb_motor(int port, double p_cw, double i_cw, double d_cw, double p_ccw, double i_ccw, double d_ccw)
         : motor_object(port),
-          Kp(p), Ki(i), Kd(d)
+          Kp_cw(p_cw), Ki_cw(i_cw), Kd_cw(d_cw),
+          Kp_ccw(p_ccw), Ki_ccw(i_ccw), Kd_ccw(d_ccw)
     {
         motor_object.resetPosition();
         motor_object.setStopping(hold); 
         motor_object.setMaxTorque(100, percent);
         target_position = 0.0;
+        
+        active_Kp = Kp_cw;
+        active_Ki = Ki_cw;
+        active_Kd = Kd_cw;
     }
 
-    // update pid
-    void setPID(double p, double i, double d)
+    void setPID(bool is_clockwise, double p, double i, double d)
     {
-        Kp = p; Ki = i; Kd = d;
+        if(is_clockwise) {
+            Kp_cw = p; Ki_cw = i; Kd_cw = d;
+        } else {
+            Kp_ccw = p; Ki_ccw = i; Kd_ccw = d;
+        }
     }
 
     // move some relative amount
