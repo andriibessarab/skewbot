@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "vex.h"
+
 // --- Constants ---
 const int MAX_BUFFER_SIZE = 100;
 
