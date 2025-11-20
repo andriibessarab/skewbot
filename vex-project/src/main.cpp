@@ -18,49 +18,48 @@ using namespace vex;
 
 int main()
 {
-    // // Configure robot
-    // vexcode_init();
+    // Configure robot
+    vexcode_init();
 
-    // // Open file
-    // FILE *file = fopen("SkewSolutions.bin", "rb");
-    // if (!file)
-    // {
-    //     print_status("Couldn't open file. Abort...");
-    //     wait(10, seconds);
-    //     Brain.programStop();
-    // }
+    // Open file
+    FILE *file = fopen("SkewSolutions.bin", "rb");
+    if (!file)
+    {
+        print_status("Couldn't open file. Abort...");
+        wait(10, seconds);
+        Brain.programStop();
+    }
 
-    // // Get state from serial
-    // print_status("Awaiting data...");
-    // std::string raw_state_string = get_state_from_serial();
+    // Get state from serial
+    print_status("Awaiting data...");
+    std::string raw_state_string = get_state_from_serial();
 
-    // // Process state
-    // print_status("Processing...");
-    // std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
+    // Process state
+    print_status("Processing...");
+    std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    // wait(2, seconds);
+    wait(2, seconds);
 
-    // // Obtain solution
-    // print_status("Searching...");
-    // std::string solution = find_solution(state_struct_stringified, file);
-    // fclose(file);
-    // if(solution == "")
-    // {
-    //     print_status("Couldn't find solution. Abort...");
-    //     wait(10, seconds);
-    //     Brain.programStop(); 
-    // }
+    // Obtain solution
+    print_status("Searching...");
+    std::string solution = find_solution(state_struct_stringified, file);
+    fclose(file);
+    if(solution == "")
+    {
+        print_status("Couldn't find solution. Abort...");
+        wait(10, seconds);
+        Brain.programStop(); 
+    }
 
-    // wait(2, seconds);
+    wait(2, seconds);
 
-    // // Use sensor to validate cube placement
-    // // loops until valid
-    // char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
-    // validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
+    // Use sensor to validate cube placement
+    // loops until valid
+    char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+    validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
-    // wait(2, seconds);
-    std::string solution = "RUfulULFLrFUfRFlFUfrlFLULfruLfUrfLULuLrl";// "lFuLuFlFuluFlFulfuLuFlFulfuLuFuLuFlF";
-
+    wait(2, seconds);
+    
     // Wait for touch to start solve
     print_status("Ready!");
     touch_led.setColor(white);
@@ -112,15 +111,11 @@ int main()
 
     // End the program
     touch_led.setColor(green);
-    const double time = Brain.Timer.time() / 1000;
+    const double time = Brain.Timer.time() / 1000.0;
     char final_message_c_style[64] = {};
-    Brain.Screen.setCursor(2,2);
+    Brain.Screen.setCursor(3,2);
     Brain.Screen.clearLine();
-    Brain.Screen.print("Solved in %.3f",time);
-    // sprintf(final_message_c_style, "Solved in %.3f seconds", time); // have to do it c style :(
-
-    // std::string final_message = final_message_c_style;
-    // print_status(final_message);
+    Brain.Screen.print("Solved in %.3f sec",time);
     wait(20, seconds);
     Brain.programStop();
 }
