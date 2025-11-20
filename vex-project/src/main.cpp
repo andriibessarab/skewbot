@@ -59,7 +59,7 @@ int main()
     validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
     wait(2, seconds);
-    // std::string solution = "FlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLu";
+    // std::string solution = "FULRLFLFULFULFURLURLUFLUFLULRULFULURLUFLURLUFLUF";// "lFuLuFlFuluFlFulfuLuFlFulfuLuFuLuFlF";
 
     // Wait for touch to start solve
     print_status("Ready!");
@@ -90,13 +90,15 @@ int main()
                 left_motor.move_relative(TURN_ANGLE);
                 break;
             case 'l':
-                left_motor.move_relative(-TURN_ANGLE);
+                left_motor.move_relative(TURN_ANGLE);
+                left_motor.move_relative(TURN_ANGLE);
                 break;
             case 'R':
                 right_motor.move_relative(TURN_ANGLE);
                 break;
             case 'r':
-                right_motor.move_relative(-TURN_ANGLE);
+                right_motor.move_relative(TURN_ANGLE);
+                right_motor.move_relative(TURN_ANGLE);
                 break;
             case 'F':
                 top_motor.move_relative(TURN_ANGLE);

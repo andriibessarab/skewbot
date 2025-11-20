@@ -24,9 +24,10 @@ private:
 
     double Kp = 0, Ki = 0, Kd = 0;
     double integral = 0.0;
-    double prev_error = 0.0;
+    double prev_position = 0.0;
     double target_position = 0.0;
     const double MAX_INTEGRAL = 25.0; 
+    const double TOLERANCE = 2.5;
 
     // returns velocity percent 
     double calculate_pid_output(double current_position)
@@ -34,10 +35,10 @@ private:
         double error = target_position - current_position;
 
         // integral
-        // only if close to target
-        if (fabs(error) < 15.0) 
+        // only if close to target but outside tolerance
+        if (fabs(error) < 15.0 && fabs(error) > TOLERANCE) 
             integral += error;
-        else
+        else if (fabs(error) >= 15.0)
             integral = 0; 
         
         // cap integral
@@ -48,11 +49,11 @@ private:
             integral_term = -MAX_INTEGRAL;
 
         // derivative
-        double derivative = error - prev_error;
-        prev_error = error;
+        double derivative = current_position - prev_position;
+        prev_position = current_position;
 
         // generate output
-        double output = (Kp * error) + integral_term + (Kd * derivative);
+        double output = (Kp * error) + integral_term - (Kd * derivative);
         
         // clamp
         if (output > 100.0) output = 100.0;
@@ -61,13 +62,15 @@ private:
         return output;
     }
 
-        // execut actual move using pid
+    // execut actual move using pid
     void execute_move() {
         const int dt_ms = 10; 
         bool settled = false;
         int settled_count = 0;
         int timeout_counter = 0;
-        const int MAX_TIMEOUT = 200;  // 2 sec
+        const int MAX_TIMEOUT = 500; 
+
+        prev_position = motor_object.position(degrees);
 
         while (!settled && timeout_counter < MAX_TIMEOUT)
         {
@@ -79,19 +82,19 @@ private:
             motor_object.spin(forward, velocity_percent, percent);
 
             // onlyc consider settled when no error
-            if (fabs(error) <= 0 && fabs(motor_object.velocity(percent)) <= 0)
+            if (fabs(error) <= TOLERANCE && fabs(motor_object.velocity(dps)) < 2)
                 settled_count++;
             else
                 settled_count = 0;
 
-            if (settled_count > 5) // each count means been settled for 50ms
+            if (settled_count > 10) 
                 settled = true;
 
             timeout_counter++;
             wait(dt_ms, msec);
         }
 
-        motor_object.stop(); // engage hold
+        motor_object.stop(); 
     }
 
 public:
@@ -130,7 +133,7 @@ public:
     {
         motor_object.resetPosition();
         target_position = 0;
-        prev_error = 0;
+        prev_position = 0;
         integral = 0;
     }
 };
