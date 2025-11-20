@@ -53,7 +53,7 @@ std::string find_solution(std::string stringified_state_struct, FILE *file)
         {
             Brain.Screen.setCursor(8, 1);
             Brain.Screen.clearLine();
-            Brain.Screen.print("%s/3149279 checked", std::to_string(counter * 256).c_str());
+            Brain.Screen.print("%.2f%% checked", ((counter * SOLUTION_BUFFER_SIZE * 100) / 3149279.0));
             
         }
 

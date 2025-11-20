@@ -31,37 +31,35 @@ int main()
     }
     else  // make sure file opened
     {
-    //     // Get state from serial
-    //     print_status("Awaiting data...");
-    //     std::string raw_state_string = get_state_from_serial();
+        // Get state from serial
+        print_status("Awaiting data...");
+        std::string raw_state_string = get_state_from_serial();
 
-    //     // Process state
-    //     print_status("Processing...");
-    //     std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
+        // Process state
+        print_status("Processing...");
+        std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    //     wait(2, seconds);
+        wait(2, seconds);
 
-    //     // Obtain solution
-    //     print_status("Searching...");
-    //     std::string solution = find_solution(state_struct_stringified, file);
-    //     fclose(file);
-    //     if(solution == "")
-    //     {
-    //         print_status("Couldn't find solution. Abort...");
-    //         wait(10, seconds);
-    //         Brain.programStop(); 
-    //     }
+        // Obtain solution
+        print_status("Searching...");
+        std::string solution = find_solution(state_struct_stringified, file);
+        fclose(file);
+        if(solution == "")
+        {
+            print_status("Couldn't find solution. Abort...");
+            wait(10, seconds);
+            Brain.programStop(); 
+        }
 
-    //     wait(2, seconds);
+        wait(2, seconds);
 
-    //     // Use sensor to validate cube placement
-    //     // loops until valid
-    //     char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
-    //     validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
+        // Use sensor to validate cube placement
+        // loops until valid
+        char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+        validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
-    //     wait(2, seconds);
-
-        std::string solution = "lRufFurlRf";
+        wait(2, seconds);
 
         // Wait for touch to start solve
         print_status("Ready!");
@@ -77,48 +75,60 @@ int main()
         Brain.Timer.reset(); // start timer
         for (int i = 0; i < solution.size(); ++i)
         {
-            char move = solution[i];
-
-            switch (move)
+            if(!skewb_motor::emergency_stopped)
             {
-                case 'U':
-                    back_motor.move_relative(TURN_ANGLE);
-                    break;
-                case 'u':
-                    back_motor.move_relative(-TURN_ANGLE);
-                    break;
-                case 'L':
-                    left_motor.move_relative(TURN_ANGLE);
-                    break;
-                case 'l':
-                    left_motor.move_relative(-TURN_ANGLE);
-                    break;
-                case 'R':
-                    right_motor.move_relative(TURN_ANGLE);
-                    break;
-                case 'r':
-                    right_motor.move_relative(-TURN_ANGLE);
-                    break;
-                case 'F':
-                    top_motor.move_relative(TURN_ANGLE);
-                    break;
-                case 'f': 
-                    top_motor.move_relative(-TURN_ANGLE);
-                    break;
-                default:
-                    break;
-            }
+                char move = solution[i];
 
-            wait(50, msec);
+                switch (move)
+                {
+                    case 'U':
+                        back_motor.move_relative(TURN_ANGLE);
+                        break;
+                    case 'u':
+                        back_motor.move_relative(-TURN_ANGLE);
+                        break;
+                    case 'L':
+                        left_motor.move_relative(TURN_ANGLE);
+                        break;
+                    case 'l':
+                        left_motor.move_relative(-TURN_ANGLE);
+                        break;
+                    case 'R':
+                        right_motor.move_relative(TURN_ANGLE);
+                        break;
+                    case 'r':
+                        right_motor.move_relative(-TURN_ANGLE);
+                        break;
+                    case 'F':
+                        top_motor.move_relative(TURN_ANGLE);
+                        break;
+                    case 'f': 
+                        top_motor.move_relative(-TURN_ANGLE);
+                        break;
+                    default:
+                        break;
+                }
+
+                wait(50, msec);
+            }
         }
 
-        // End the program
-        touch_led.setColor(green);
-        const double time = Brain.Timer.time() / 1000.0;
-        Brain.Screen.setCursor(3,2);
-        Brain.Screen.clearLine();
-        Brain.Screen.print("Solved in %.3f sec",time);
-        wait(20, seconds);
+        if(!skewb_motor::emergency_stopped)
+        {
+            // End the program
+            touch_led.setColor(green);
+            const double time = Brain.Timer.time() / 1000.0;
+            Brain.Screen.setCursor(3,2);
+            Brain.Screen.clearLine();
+            Brain.Screen.print("Solved in %.3f sec",time);
+            wait(20, seconds);
+        }
+        else
+        {
+            print_status("Aborting...");
+            wait(2, seconds);
+        }
+
     }
 
     Brain.programStop();

@@ -114,7 +114,7 @@ private:
             timeout_counter++;
             wait(dt_ms, msec);
 
-            // Always listen for pause
+            // Always listen for pause or emerg. stop
             if(touch_led_pointer->pressing())
             {
                 // stop motor
@@ -129,8 +129,13 @@ private:
                 while(!touch_led_pointer->pressing())
                 {}
                 touch_led_pointer->setColor(blue);
-                
+
                 wait(500, msec);
+            } 
+            else if(brain_pointer->buttonUp.pressing())
+            {
+                emergency_stopped = true;
+                settled = true; // so that we exit
             }
         }
 
@@ -138,8 +143,9 @@ private:
     }
 
 public:
-    static brain* brain_pointer;         // for debugging
-    static touchled* touch_led_pointer;  // for pausing
+    static brain* brain_pointer;          // for debugging
+    static touchled* touch_led_pointer;   // for pausing
+    static bool emergency_stopped;
 
     skewb_motor(int port, double p_cw, double i_cw, double d_cw, double p_ccw, double i_ccw, double d_ccw)
         : motor_object(port),

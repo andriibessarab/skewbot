@@ -21,6 +21,7 @@ skewb_motor back_motor(BACK_MOTOR_PORT,    2.00, 0.0, 8.6,    2.15, 0.0, 10.);
 
 brain* skewb_motor::brain_pointer = &Brain;
 touchled* skewb_motor::touch_led_pointer = &touch_led;
+bool skewb_motor::emergency_stopped = false;
 
 void initalize_random_seed()
 {
