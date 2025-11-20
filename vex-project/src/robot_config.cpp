@@ -42,5 +42,5 @@ void vexcode_init(void)
   // make font smaller
   Brain.Screen.setFont(mono12);
 
-  // top_motor.set_angle_offset(13);
+
 }

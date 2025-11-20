@@ -3,7 +3,6 @@
 
 using namespace vex;
 
-const int MOTOR_SPEED = 80;       //%
 const int MOTOR_MAX_TORQUE = 100; //%
 
 const int TOP_MOTOR_PORT = PORT5;
@@ -25,7 +24,6 @@ struct custom_motor
     const int port_number;
     motor motor_object;
     int ANGLE_OFFSET = 0;
-
     custom_motor(int port)
         : port_number(port),
           motor_object(port)
@@ -42,6 +40,7 @@ struct custom_motor
     {
         ANGLE_OFFSET = offset;
     }
+
     void PrintPosition()
     {
         Brain.Screen.setCursor(6, 1);
@@ -54,10 +53,9 @@ struct custom_motor
         static double I = 0.0;
         static double prev_err = 0.0;
 
-        double Kp = 2;
-        double Ki = 0.04;
-        double Kd = 0.1;
-
+        double Kp = 1;
+        double Ki = 0;
+        double Kd = 0;
 
         double u = 0.0;
         double err = setpoint - meas;
@@ -70,10 +68,10 @@ struct custom_motor
         else
         {
             // ----- Integral -----
-             if (fabs(err) > 3.0)   // your “don’t integrate near target” rule
-             {
-            I += Ki * err * dt;
-             }
+            if (fabs(err) > 2.0) // your “don’t integrate near target” rule
+            {
+                I += Ki * err * dt;
+            }
 
             // Anti-windup
             if (I > max)
@@ -103,21 +101,37 @@ struct custom_motor
 
     // True: CW 90°
     // False: CCW 90°
-    void spin_motor(int motorPower, bool dir, bool IsTop)
+    void spin_motor(int motorPower, bool dir, bool IsProblematic)
     {
-        PID_Step(0, 0, 0, 0, 0, true, IsTop);
+        PID_Step(0, 0, 0, 0, 0, true, IsProblematic);
 
-        motor_object.setPosition(0, degrees);
+        if (motor_object.position(degrees) < -20){
+            Brain.Screen.setCursor(3,2);
+            Brain.Screen.print("FUCKKKKKKKK");
+            motor_object.setPosition(motor_object.position(degrees)+120, degrees);
+            wait(5,seconds);
+
+        }else{
+            if(motor_object.position(degrees) > 20){
+                Brain.Screen.setCursor(3,2);
+                Brain.Screen.print("FUCKKKKKKKK");
+                motor_object.setPosition(motor_object.position(degrees)-120, degrees);
+                wait(5,seconds);
+            }
+        }
+
 
         const int period_ms = 20;
         const double dt = period_ms / 1000.0;
 
-        double MIN_ERROR = 0.5;
-        const double MIN_EFFORT = 10.0;
-        if (IsTop){
-            ANGLE_OFFSET = -0.1 ? !dir:0.1;
-        }
-        const double ANGLE = 120 + ANGLE_OFFSET;
+        double MIN_ERROR = 0.376;
+        const double MIN_EFFORT = 10;
+        // change this laterrrrr #andrii
+
+         ANGLE_OFFSET = dir ? -fabs(ANGLE_OFFSET) : fabs(ANGLE_OFFSET);
+
+        double ANGLE = 120 + ANGLE_OFFSET;
+    
 
         int minSpeed = -motorPower;
         int maxSpeed = motorPower;
@@ -139,12 +153,13 @@ struct custom_motor
             }
             else
             {
-                double power = PID_Step(targetAngle, current, dt, minSpeed, maxSpeed, false, IsTop);
+                double power = PID_Step(targetAngle, current, dt, minSpeed, maxSpeed, false, IsProblematic);
 
                 if (fabs(power) < MIN_EFFORT)
                 {
                     power = (power >= 0) ? MIN_EFFORT : -MIN_EFFORT;
                 }
+    
 
                 double speed = fabs(power);
                 motor_object.setVelocity(speed, percent);
@@ -158,7 +173,7 @@ struct custom_motor
                     motor_object.spin(reverse);
                 }
 
-                wait(period_ms, msec);
+                // wait(period_ms, msec);
             }
         }
     }
