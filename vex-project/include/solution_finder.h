@@ -1,10 +1,17 @@
+//----------------------------------------------------------------------------
+//
+//  Module:       solution_finder.h
+//  Description:  Header for module that finds solution on SD card
+//  Authors:      MTE 100 & 121 Group 15
+//
+//----------------------------------------------------------------------------
+
 #ifndef SOLUTION_FINDER_H
 #define SOLUTION_FINDER_H
 
-#include <string>
-#include <cstdio> 
-#include <cstring>
-#include <array>
+#pragma once
+
+#include "vex.h"
 #include "robot_config.h"
 
 // --- Constants ---

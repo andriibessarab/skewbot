@@ -1,5 +1,12 @@
+//----------------------------------------------------------------------------
+//
+//  Module:       sensor_validation.cpp
+//  Description:  Validate cube placement using sensors.
+//  Authors:      MTE 100 & 121 Group 15
+//
+//----------------------------------------------------------------------------
+
 #include "sensor_validation.h"
-#include "misc_functions.h"
 
 bool validate_cube_placement(char expected_char, distance& distance_sensor, optical& optical_sensor, touchled& touch_led)
 {

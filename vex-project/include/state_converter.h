@@ -1,11 +1,17 @@
+//----------------------------------------------------------------------------
+//
+//  Module:       state_converter.h
+//  Description:  Header for module that has everything needed to convert 
+//                colour string to stringified struct in correct orientation.
+//  Authors:      MTE 100 & 121 Group 15
+//
+//----------------------------------------------------------------------------
+
+#ifndef STATE_CONVERTER_H
+#define STATE_CONVERTER_H
+
 #pragma once
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <array>
-#include <algorithm>
-#include <cstring>
 #include "robot_config.h"
 
 // --- Skewb State Representation ---
@@ -68,3 +74,5 @@ std::string state_rotate_x(std::string state);
 std::string center_to_string(CENTER c);
 std::string corner_to_string(CORNER c);
 std::string find_normalized_stringified_struct(std::string state_string);
+
+#endif STATE_CONVERTER_H

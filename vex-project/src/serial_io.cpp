@@ -2,11 +2,11 @@
 //
 //  Module:       serial_io.cpp
 //  Description:  Read colour string from serial
+//  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
 
 #include "serial_io.h"
-#include "vex.h"
 
 using namespace vex;
 

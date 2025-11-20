@@ -1,5 +1,15 @@
+//----------------------------------------------------------------------------
+//
+//  Module:       vex.h
+//  Description:  Header file with all imports used in project.
+//  Authors:      MTE 100 & 121 Group 15
+//
+//----------------------------------------------------------------------------
+
 #ifndef VEX_H_
 #define VEX_H_
+
+#include "iq2_cpp.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -11,9 +21,9 @@
 #include <cstdio> 
 #include <map>
 #include <vector>
-#include "iq2_cpp.h"
+#include <cmath>
+#include <unordered_map>
+#include <algorithm>
+#include <cstring>
 
 #endif
-
-
-

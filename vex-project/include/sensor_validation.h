@@ -1,9 +1,18 @@
+//----------------------------------------------------------------------------
+//
+//  Module:       sensor_validation.h
+//  Description:  Header for file that validates cube placement using sensors.
+//  Authors:      MTE 100 & 121 Group 15
+//
+//----------------------------------------------------------------------------
+
 #ifndef SENSOR_VALIDATION_H
 #define SENSOR_VALIDATION_H
 
 #pragma once
 
 #include "vex.h"
+#include "misc_functions.h"
 
 using namespace vex;
 

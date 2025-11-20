@@ -2,10 +2,10 @@
 //
 //  Module:       solution_finder.cpp
 //  Description:  Find solution on SD card
+//  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
 
-#include "vex.h"
 #include "solution_finder.h"
 
 std::string find_solution(std::string stringified_state_struct, FILE *file)

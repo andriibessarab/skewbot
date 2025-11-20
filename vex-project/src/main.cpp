@@ -2,6 +2,7 @@
 //
 //  Module:       main.cpp
 //  Description:  The main entrypoint
+//  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
 
@@ -53,73 +54,60 @@ int main()
     // validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
     // wait(2, seconds);
-    std::string solution = "f";
+    std::string solution = "FlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLu";
 
     // Wait for touch to start solve
     print_status("Ready!");
     touch_led.setColor(white);
     while (!touch_led.pressing())
-    {
-    }
+    {}
     while (touch_led.pressing())
-    {
-    }
+    {}
     touch_led.setColor(blue);
 
     // Solve
     print_status("Solving...");
 
+       const double TURN_ANGLE = 120.0; 
+    
+    // Loop through the solution string
     for (int i = 0; i < solution.size(); ++i)
     {
-
-        top_motor.stop();
-        left_motor.stop();
-        right_motor.stop();
-        back_motor.stop();
         char move = solution[i];
 
         switch (move)
         {
         case 'U':
-            perform_a_move(back_motor, true, false);
+            back_motor.move_relative(TURN_ANGLE);
             break;
-
         case 'u':
-            perform_a_move(back_motor, false, false);
-            back_motor.PrintPosition();
+            back_motor.move_relative(TURN_ANGLE);
+            back_motor.move_relative(TURN_ANGLE);
             break;
         case 'L':
-            perform_a_move(left_motor, true, false);
-            left_motor.PrintPosition();
+            left_motor.move_relative(TURN_ANGLE);
             break;
         case 'l':
-            perform_a_move(left_motor, false, false);
-            left_motor.PrintPosition();
+            left_motor.move_relative(-TURN_ANGLE);
             break;
         case 'R':
-            perform_a_move(right_motor, true, false);
-            right_motor.PrintPosition();
+            right_motor.move_relative(TURN_ANGLE);
             break;
         case 'r':
-            perform_a_move(right_motor, false, false);
-            right_motor.PrintPosition();
+            right_motor.move_relative(-TURN_ANGLE);
             break;
         case 'F':
-            perform_a_move(top_motor, true, false);
-            top_motor.PrintPosition();
+            top_motor.move_relative(TURN_ANGLE);
             break;
-        case 'f':
-            perform_a_move(top_motor, false, true);
-            top_motor.PrintPosition();
+        case 'f': 
+            top_motor.move_relative(TURN_ANGLE);
+            top_motor.move_relative(TURN_ANGLE);
             break;
         default:
             break;
         }
+        wait(50, msec);
     }
-    top_motor.stop();
-    left_motor.stop();
-    right_motor.stop();
-    back_motor.stop();
 
     // End the program
     touch_led.setColor(green);

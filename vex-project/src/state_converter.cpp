@@ -3,6 +3,7 @@
 //  Module:       state_converter.cpp
 //  Description:  Everything needed to convert colour string to
 //                stringified struct in correct orientation.
+//  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
 
