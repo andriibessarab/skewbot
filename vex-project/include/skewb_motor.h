@@ -113,16 +113,39 @@ private:
 
             timeout_counter++;
             wait(dt_ms, msec);
+
+            // Always listen for pause
+            if(touch_led_pointer->pressing())
+            {
+                // stop motor
+                motor_object.stop();
+
+                // wait for person to let go and press again
+                touch_led_pointer->setColor(white);
+                while(!touch_led_pointer->pressing())
+                {}
+                while(touch_led_pointer->pressing())
+                {}
+                while(!touch_led_pointer->pressing())
+                {}
+                touch_led_pointer->setColor(blue);
+                
+                wait(500, msec);
+            }
         }
 
         motor_object.stop(); 
     }
 
 public:
+    static brain* brain_pointer;         // for debugging
+    static touchled* touch_led_pointer;  // for pausing
+
     skewb_motor(int port, double p_cw, double i_cw, double d_cw, double p_ccw, double i_ccw, double d_ccw)
         : motor_object(port),
           Kp_cw(p_cw), Ki_cw(i_cw), Kd_cw(d_cw),
           Kp_ccw(p_ccw), Ki_ccw(i_ccw), Kd_ccw(d_ccw)
+
     {
         motor_object.resetPosition();
         motor_object.setStopping(hold); 

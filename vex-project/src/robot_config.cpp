@@ -17,7 +17,10 @@ optical optical_sensor = optical(OPTICAL_SENSOR_PORT);
 skewb_motor top_motor(TOP_MOTOR_PORT,      2.0,  0.0, 7.9,    2.0,  0.0, 9.3); 
 skewb_motor left_motor(LEFT_MOTOR_PORT,    1.95, 0.0, 8.5,    1.95, 0.0, 7.5); 
 skewb_motor right_motor(RIGHT_MOTOR_PORT,  1.90, 0.0, 8.5,    1.90, 0.0, 8.0);
-skewb_motor back_motor(BACK_MOTOR_PORT,    2.00, 0.0, 8.6,    2.15, 0.0, 10.1);
+skewb_motor back_motor(BACK_MOTOR_PORT,    2.00, 0.0, 8.6,    2.15, 0.0, 10.);
+
+brain* skewb_motor::brain_pointer = &Brain;
+touchled* skewb_motor::touch_led_pointer = &touch_led;
 
 void initalize_random_seed()
 {

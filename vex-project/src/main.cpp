@@ -29,93 +29,97 @@ int main()
         wait(10, seconds);
         Brain.programStop();
     }
-
-    // Get state from serial
-    print_status("Awaiting data...");
-    std::string raw_state_string = get_state_from_serial();
-
-    // Process state
-    print_status("Processing...");
-    std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
-
-    wait(2, seconds);
-
-    // Obtain solution
-    print_status("Searching...");
-    std::string solution = find_solution(state_struct_stringified, file);
-    fclose(file);
-    if(solution == "")
+    else  // make sure file opened
     {
-        print_status("Couldn't find solution. Abort...");
-        wait(10, seconds);
-        Brain.programStop(); 
-    }
+    //     // Get state from serial
+    //     print_status("Awaiting data...");
+    //     std::string raw_state_string = get_state_from_serial();
 
-    wait(2, seconds);
+    //     // Process state
+    //     print_status("Processing...");
+    //     std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    // Use sensor to validate cube placement
-    // loops until valid
-    char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
-    validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
+    //     wait(2, seconds);
 
-    wait(2, seconds);
-    
-    // Wait for touch to start solve
-    print_status("Ready!");
-    touch_led.setColor(white);
-    while (!touch_led.pressing())
-    {}
-    while (touch_led.pressing())
-    {}
-    touch_led.setColor(blue);
+    //     // Obtain solution
+    //     print_status("Searching...");
+    //     std::string solution = find_solution(state_struct_stringified, file);
+    //     fclose(file);
+    //     if(solution == "")
+    //     {
+    //         print_status("Couldn't find solution. Abort...");
+    //         wait(10, seconds);
+    //         Brain.programStop(); 
+    //     }
 
-    // Solve
-    print_status("Solving...");
-    Brain.Timer.reset(); // start timer
-    for (int i = 0; i < solution.size(); ++i)
-    {
-        char move = solution[i];
+    //     wait(2, seconds);
 
-        switch (move)
+    //     // Use sensor to validate cube placement
+    //     // loops until valid
+    //     char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+    //     validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
+
+    //     wait(2, seconds);
+
+        std::string solution = "lRufFurlRf";
+
+        // Wait for touch to start solve
+        print_status("Ready!");
+        touch_led.setColor(white);
+        while (!touch_led.pressing())
+        {}
+        while (touch_led.pressing())
+        {}
+        touch_led.setColor(blue);
+
+        // Solve
+        print_status("Solving...");
+        Brain.Timer.reset(); // start timer
+        for (int i = 0; i < solution.size(); ++i)
         {
-            case 'U':
-                back_motor.move_relative(TURN_ANGLE);
-                break;
-            case 'u':
-                back_motor.move_relative(-TURN_ANGLE);
-                break;
-            case 'L':
-                left_motor.move_relative(TURN_ANGLE);
-                break;
-            case 'l':
-                left_motor.move_relative(-TURN_ANGLE);
-                break;
-            case 'R':
-                right_motor.move_relative(TURN_ANGLE);
-                break;
-            case 'r':
-                right_motor.move_relative(-TURN_ANGLE);
-                break;
-            case 'F':
-                top_motor.move_relative(TURN_ANGLE);
-                break;
-            case 'f': 
-                top_motor.move_relative(-TURN_ANGLE);
-                break;
-            default:
-                break;
+            char move = solution[i];
+
+            switch (move)
+            {
+                case 'U':
+                    back_motor.move_relative(TURN_ANGLE);
+                    break;
+                case 'u':
+                    back_motor.move_relative(-TURN_ANGLE);
+                    break;
+                case 'L':
+                    left_motor.move_relative(TURN_ANGLE);
+                    break;
+                case 'l':
+                    left_motor.move_relative(-TURN_ANGLE);
+                    break;
+                case 'R':
+                    right_motor.move_relative(TURN_ANGLE);
+                    break;
+                case 'r':
+                    right_motor.move_relative(-TURN_ANGLE);
+                    break;
+                case 'F':
+                    top_motor.move_relative(TURN_ANGLE);
+                    break;
+                case 'f': 
+                    top_motor.move_relative(-TURN_ANGLE);
+                    break;
+                default:
+                    break;
+            }
+
+            wait(50, msec);
         }
 
-        wait(50, msec);
+        // End the program
+        touch_led.setColor(green);
+        const double time = Brain.Timer.time() / 1000.0;
+        Brain.Screen.setCursor(3,2);
+        Brain.Screen.clearLine();
+        Brain.Screen.print("Solved in %.3f sec",time);
+        wait(20, seconds);
     }
 
-    // End the program
-    touch_led.setColor(green);
-    const double time = Brain.Timer.time() / 1000.0;
-    char final_message_c_style[64] = {};
-    Brain.Screen.setCursor(3,2);
-    Brain.Screen.clearLine();
-    Brain.Screen.print("Solved in %.3f sec",time);
-    wait(20, seconds);
     Brain.programStop();
 }

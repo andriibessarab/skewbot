@@ -50,12 +50,6 @@ bool validate_cube_placement(char expected_char, distance& distance_sensor, opti
             else if (hue >= HUE_BLUE_MIN && hue < HUE_BLUE_MAX)
                 detected_char = 'B';
         }
-
-        // Debug Print
-        Brain.Screen.clearScreen();
-        Brain.Screen.setCursor(1,1);
-        Brain.Screen.print("H:%.0f B:%.0f %c", hue, brightness, detected_char);
-
         // Small delay to read screen
         wait(DELAY_DEBUG_PRINT_SEC, seconds);
 
@@ -65,7 +59,6 @@ bool validate_cube_placement(char expected_char, distance& distance_sensor, opti
 
         if (distance_ok && colour_ok)
         {
-            Brain.Screen.printAt(1, UI_TEXT_COL, "MATCH: %c", detected_char);
             touch_led.setColor(green);
             cube_validated = true;
             wait(DELAY_SUCCESS_SEC, seconds);
@@ -73,7 +66,6 @@ bool validate_cube_placement(char expected_char, distance& distance_sensor, opti
         else
         {
             touch_led.setColor(red); 
-            Brain.Screen.printAt(1, UI_TEXT_COL, "WANT: %c GOT: %c", expected_char, detected_char);
             
             if(!distance_ok)      print_status("Error: No Cube");
             else if(!colour_ok)   print_status("Error: Wrong Placement");
