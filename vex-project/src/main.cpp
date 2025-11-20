@@ -2,65 +2,19 @@
 //
 //  Module:       main.cpp
 //  Description:  The main entrypoint
+//  Authors:      MTE 100 & 121 Group 15
 //
 //----------------------------------------------------------------------------
-
-// --- Info ---
-// SCANNED STATE
-// Index = (FaceIndex * 5) + StickerIndex
-// Faces: U=0, F=1, R=2, B=3, L=4, D=5
-// Stickers: C=0, TL=1, TR=2, BR=3, BL=4
 
 #include "vex.h"
 #include "robot_config.h"
 #include "state_converter.h"
+#include "serial_io.h"
+#include "solution_finder.h"
+#include "misc_functions.h"
+#include "sensor_validation.h"
 
 using namespace vex;
-
-// --- Constants ---
-const int MAX_BUFFER_SIZE = 100;
-const int CUBE_UPPER_DISTANCE = 40;
-const int CUBE_LOWER_DISTANCE = 34;
-const int ORANGE_UPPER_LIMIT = 350;
-const int ORANGE_LOWER_LIMIT = 10;
-
-// --- Local Functions Prototypes ---
-void print_status(std::string status);
-std::string get_state_from_serial();
-std::string FindSolutions(std::string stringified_state_struct, FILE *file);
-void perform_a_move(custom_motor &m, bool inverted, bool &emergency_stop);
-
-void start_solve(){
-    vex::color led_color = red;
-
-    touch_led.setColor(red);
-    optical_sensor.setLightPower(100);
-    optical_sensor.setLight(ledState::on);
-    while (!touch_led.pressing() || led_color == red)
-    {
-        if((optical_sensor.hue()<ORANGE_UPPER_LIMIT &&
-            optical_sensor.hue()>ORANGE_LOWER_LIMIT) ||
-            distance_sensor.objectDistance(mm) > CUBE_UPPER_DISTANCE ||
-            distance_sensor.objectDistance(mm) < CUBE_LOWER_DISTANCE)
-        {
-            led_color = red;
-        }
-        else
-        {
-            led_color = green;
-        }
-        touch_led.setColor(led_color);
-    }
-    while (touch_led.pressing())
-    {
-    }
-    optical_sensor.setLight(ledState::off);
-
-    touch_led.setFade(slow);
-    touch_led.setColor(blue);
-}
-
-/////////////////////////////// MAIN PROGRAM ///////////////////////////////
 
 int main()
 {
@@ -69,294 +23,96 @@ int main()
     // Configure robot
     vexcode_init();
     // Open file
-    
-    FILE *file = fopen("SkewSolutions.bin", "rb");
-    if (!file)
-    {
-        print_status("Couldn't open file. Aborting...");
-        wait(10, seconds);
-        Brain.programStop();
-    }
+    // FILE *file = fopen("SkewSolutions.bin", "rb");
+    // if (!file)
+    // {
+    //     print_status("Couldn't open file. Aborting...");
+    //     wait(10, seconds);
+    //     Brain.programStop();
+    // }
 
-    // Get state from serial
-    print_status("Awaiting data...");
-    std::string raw_state_string = get_state_from_serial();
+    // // Get state from serial
+    // print_status("Awaiting data...");
+    // std::string raw_state_string = get_state_from_serial();
 
-    // Process state
-    print_status("Processing...");
-    std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
+    // // Process state
+    // print_status("Processing...");
+    // std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    wait(2, seconds);
+    // wait(2, seconds);
 
-    // Obtain solution
-    print_status("Searching...");
-    std::string solution = FindSolutions(state_struct_stringified, file);
-    fclose(file);
+    // // Obtain solution
+    // print_status("Searching...");
+    // std::string solution = find_solution(state_struct_stringified, file);
 
-    wait(2, seconds);
-    
-    // Check sensory data
-    wait(2, seconds);
+    // fclose(file);
+
+    // wait(2, seconds);
+
+    // // Use sensor to validate cube placement
+    // // loops until valid
+    // char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+    // validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
+
+    // wait(2, seconds);
+    std::string solution = "FlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLu";
+
     // Wait for touch to start solve
-    
-    
-    start_solve();
     print_status("Ready!");
+    touch_led.setColor(white);
+    while (!touch_led.pressing())
+    {}
+    while (touch_led.pressing())
+    {}
+    touch_led.setColor(blue);
+
     // Solve
     print_status("Solving...");
 
-    while(move_counter<solution.size() && !emergency_stop)
+       const double TURN_ANGLE = 120.0; 
+    
+    // Loop through the solution string
+    for (int i = 0; i < solution.size(); ++i)
     {
-        
-        top_motor.stop();
-        left_motor.stop();
-        right_motor.stop();
-        back_motor.stop();
-        char move = solution[move_counter];
-        Brain.Screen.setCursor(5, 1);
-        Brain.Screen.clearLine();
-        Brain.Screen.print("Move: %c   ", move);
+        char move = solution[i];
+
         switch (move)
         {
-   
-
         case 'U':
-            perform_a_move(back_motor, true, emergency_stop);
+            back_motor.move_relative(TURN_ANGLE);
             break;
         case 'u':
-            perform_a_move(back_motor, false, emergency_stop);
+            back_motor.move_relative(TURN_ANGLE);
+            back_motor.move_relative(TURN_ANGLE);
             break;
         case 'L':
-            perform_a_move(left_motor, true, emergency_stop);
+            left_motor.move_relative(TURN_ANGLE);
             break;
         case 'l':
-            perform_a_move(left_motor, false, emergency_stop);
+            left_motor.move_relative(-TURN_ANGLE);
             break;
         case 'R':
-            perform_a_move(right_motor, true, emergency_stop);
+            right_motor.move_relative(TURN_ANGLE);
             break;
         case 'r':
-            perform_a_move(right_motor, false, emergency_stop);
+            right_motor.move_relative(-TURN_ANGLE);
             break;
         case 'F':
-            perform_a_move(top_motor, true, emergency_stop);
-            top_motor.PrintPosition();
+            top_motor.move_relative(TURN_ANGLE);
             break;
-        case 'f':
-            perform_a_move(top_motor, false, emergency_stop);
-            top_motor.PrintPosition();
+        case 'f': 
+            top_motor.move_relative(TURN_ANGLE);
+            top_motor.move_relative(TURN_ANGLE);
             break;
         default:
             break;
         }
-        move_counter++;
+        wait(50, msec);
     }
-    top_motor.stop();
-    left_motor.stop();
-    right_motor.stop();
-    back_motor.stop();
 
     // End the program
-    if(emergency_stop == true)
-    {
-        print_status("Manually Aborted");
-        touch_led.setColor(red);
-    }
-    else
-    {
-        print_status("Solved!");
-    }
+    touch_led.setColor(green);
+    print_status("Solved!");
     wait(20, seconds);
     Brain.programStop();
-}
-
-/////////////////////////////// LOCAL FUNCTIONS ///////////////////////////////
-// Print status updates to brain
-void print_status(std::string status)
-{
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(2, 1);
-    Brain.Screen.print("---SKEWBOT---");
-    Brain.Screen.setCursor(3, 1);
-    Brain.Screen.print(status.c_str());
-}
-
-// Get state from serial
-std::string get_state_from_serial()
-{
-    char buffer[MAX_BUFFER_SIZE];
-
-    while (true)
-    {
-        if (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL)
-        {
-            // We got data, process it
-            buffer[strcspn(buffer, "\n\r")] = '\0';
-            if (strlen(buffer) > 0)
-                return std::string(buffer); // Return the valid string
-        }
-        else
-        {
-            // --- THIS IS THE FIX ---
-            // fgets returned NULL (EOF or error).
-            // We must stop looping and return to main().
-
-            // Return an empty string to signal an error.
-            return "";
-        }
-
-        // This wait is only hit if fgets got an empty line
-        wait(20, msec);
-    }
-}
-
-struct State_Solution
-{
-    uint64_t CurState;
-    uint64_t EncodedSolution;
-};
-
-std::string FindSolutions(std::string stringified_state_struct, FILE *file)
-{
-    const std::string CubeState = stringified_state_struct.substr(0, 38);
-    const std::string ToPrint1 = stringified_state_struct.substr(0, 19);
-    const std::string ToPrint2 = stringified_state_struct.substr(19, 18);
-
-    const std::string needed_orientation = stringified_state_struct.substr(40, 8);
-
-    static char file_buffer[32768];
-    setvbuf(file, file_buffer, _IOFBF, sizeof(file_buffer));
-    const int8_t StateSize = 9;
-    const int SizeOfBuffer = 256;
-    State_Solution Buffer[SizeOfBuffer];
-    std::string State[StateSize];
-    int8_t PrevSubIndex = 0;
-    int8_t IndexToPush = 0;
-    bool found = false;
-    const char Centers[6] = {'W', 'G', 'O', 'B', 'R', 'Y'};
-    std::string Solution;
-    const std::array<std::string, 8> Corners = {"UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBL", "DBR"};
-    const char Moves[9] = {' ', 'L', 'l', 'R', 'r', 'U', 'u', 'F', 'f'};
-    int counter = 0;
-    int OrineationNOAMTHCESCOUNTER = 0;
-    for (int8_t i = 0; i < CubeState.length(); i++)
-    {
-        if (CubeState[i] == ' ')
-        {
-            State[IndexToPush] = CubeState.substr(PrevSubIndex, i - PrevSubIndex);
-            PrevSubIndex = i + 1;
-            IndexToPush++;
-
-            if (IndexToPush == 8)
-            {
-                State[8] = CubeState.substr(PrevSubIndex);
-
-                // Get out of for loop cz no break...
-                i = CubeState.length();
-            }
-        }
-    }
-
-    while (!found)
-    {
-        counter++;
-        Brain.Screen.setCursor(9, 1);
-
-        if (counter % 1000 == 0)
-        {
-            Brain.Screen.clearLine();
-            Brain.Screen.print(std::to_string(counter).c_str());
-        }
-
-        size_t ReadCount = fread(Buffer, sizeof(State_Solution), SizeOfBuffer, file);
-        if (ReadCount == 0)
-        {
-            found = true;
-            break;
-        }
-
-        for (size_t i = 0; i < ReadCount; i++)
-        {
-
-            bool IsEliminated = false;
-            std::string centers;
-            std::string corners;
-
-            int current = 0b0;
-
-            for (int j = 0; j < 6; j++)
-            {
-                current = (Buffer[i].CurState >> (40 + (j * 3))) & 0b111;
-                centers += Centers[current];
-                if (Centers[current] != State[0][j])
-                {
-                    IsEliminated = true;
-                    j = 6;
-                    // get out of for loop cz no break...
-                }
-            }
-
-            if (IsEliminated)
-            {
-                continue;
-            }
-
-            for (int j = 0; j < 8; j++)
-            {
-                current = (Buffer[i].CurState >> (16 + (j * 3))) & 0b111;
-                corners += Corners[current] + " ";
-                if (Corners[current] != State[1 + j])
-                {
-                    IsEliminated = true;
-                    // get out of for loop cz no break...
-                    j = 8;
-                }
-            }
-
-            if (IsEliminated)
-            {
-                continue;
-            }
-
-            std::string Orienation;
-            for (int j = 0; j < 8; j++)
-            {
-                current = (Buffer[i].CurState >> (2 * j)) & 0b11;
-                // convert 0,1,2,3,4,5 -> '0','1'...etc
-                Orienation += '0' + current;
-            }
-
-            if (Orienation == needed_orientation)
-            {
-                Brain.Screen.setCursor(8, 1);
-                Brain.Screen.print(Orienation.c_str());
-                found = true;
-                for (int j = 0; j < 11; j++)
-                {
-                    current = (Buffer[i].EncodedSolution >> (j * 4)) & 0b1111;
-                    if (current == 0)
-                    {
-                        break;
-                    }
-                    Solution += Moves[current];
-                }
-                return Solution;
-            }
-        }
-        if (ReadCount != SizeOfBuffer)
-        {
-            // Means read to the end of file
-            //  i.e. we successfully read 6 entries but size that we tried to read was 16
-            found = true;
-        }
-    }
-    return Solution;
-}
-
-void perform_a_move(custom_motor &m, bool inverted, bool &emergency_stop)
-{
-    if (inverted)
-        m.spin_motor(100, true, emergency_stop);
-    else
-        m.spin_motor(100, false, emergency_stop);
 }
