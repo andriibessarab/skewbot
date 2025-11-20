@@ -18,9 +18,10 @@ using namespace vex;
 
 int main()
 {
+    bool emergency_stop = false;
+    int move_counter = 0;
     // Configure robot
     vexcode_init();
-
     // Open file
     // FILE *file = fopen("SkewSolutions.bin", "rb");
     // if (!file)
