@@ -14,10 +14,10 @@ distance distance_sensor = distance(DISTANCE_SENSOR_PORT);
 touchled touch_led = touchled(TOUCH_LED_PORT);
 optical optical_sensor = optical(OPTICAL_SENSOR_PORT);
 
-skewb_motor top_motor(TOP_MOTOR_PORT, 1.6, 0.0, 0.0); 
+skewb_motor top_motor(TOP_MOTOR_PORT, 1.9, 0.0, 0.0); 
 skewb_motor left_motor(LEFT_MOTOR_PORT, 1.5, 0.00, 0.0); 
 skewb_motor right_motor(RIGHT_MOTOR_PORT, 1.5, 0.0, 0.0);
-skewb_motor back_motor(BACK_MOTOR_PORT, 1.34, 0.0, 0.0);
+skewb_motor back_motor(BACK_MOTOR_PORT, 1.6, 0.0, 0.0);
 
 void initalize_random_seed()
 {

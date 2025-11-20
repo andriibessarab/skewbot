@@ -15,6 +15,8 @@
 
 using namespace vex;
 
+const int TURN_ANGLE = 120;
+
 class skewb_motor
 {
 private:

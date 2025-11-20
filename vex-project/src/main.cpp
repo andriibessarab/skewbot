@@ -68,51 +68,51 @@ int main()
 
     // Solve
     print_status("Solving...");
-
-       const double TURN_ANGLE = 120.0; 
-    
-    // Loop through the solution string
+    Brain.Timer.reset(); // start timer
     for (int i = 0; i < solution.size(); ++i)
     {
         char move = solution[i];
 
         switch (move)
         {
-        case 'U':
-            back_motor.move_relative(TURN_ANGLE);
-            break;
-        case 'u':
-            back_motor.move_relative(TURN_ANGLE);
-            back_motor.move_relative(TURN_ANGLE);
-            break;
-        case 'L':
-            left_motor.move_relative(TURN_ANGLE);
-            break;
-        case 'l':
-            left_motor.move_relative(-TURN_ANGLE);
-            break;
-        case 'R':
-            right_motor.move_relative(TURN_ANGLE);
-            break;
-        case 'r':
-            right_motor.move_relative(-TURN_ANGLE);
-            break;
-        case 'F':
-            top_motor.move_relative(TURN_ANGLE);
-            break;
-        case 'f': 
-            top_motor.move_relative(TURN_ANGLE);
-            top_motor.move_relative(TURN_ANGLE);
-            break;
-        default:
-            break;
+            case 'U':
+                back_motor.move_relative(TURN_ANGLE);
+                break;
+            case 'u':
+                back_motor.move_relative(TURN_ANGLE);
+                back_motor.move_relative(TURN_ANGLE);
+                break;
+            case 'L':
+                left_motor.move_relative(TURN_ANGLE);
+                break;
+            case 'l':
+                left_motor.move_relative(-TURN_ANGLE);
+                break;
+            case 'R':
+                right_motor.move_relative(TURN_ANGLE);
+                break;
+            case 'r':
+                right_motor.move_relative(-TURN_ANGLE);
+                break;
+            case 'F':
+                top_motor.move_relative(TURN_ANGLE);
+                break;
+            case 'f': 
+                top_motor.move_relative(TURN_ANGLE);
+                top_motor.move_relative(TURN_ANGLE);
+                break;
+            default:
+                break;
         }
+
         wait(50, msec);
     }
 
     // End the program
+    const double time = Brain.Timer.value() / 1000;
     touch_led.setColor(green);
-    print_status("Solved!");
+    std::string final_messsage = "Solved in " + std::to_string(static_cast<int>(time)) + " seconds";
+    print_status(final_messsage);
     wait(20, seconds);
     Brain.programStop();
 }
