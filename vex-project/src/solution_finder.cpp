@@ -51,8 +51,10 @@ std::string find_solution(std::string stringified_state_struct, FILE *file)
 
         if (counter % SCREEN_UPDATE_FREQ == 0)
         {
+            Brain.Screen.setCursor(8, 1);
             Brain.Screen.clearLine();
-            Brain.Screen.print(std::to_string(counter).c_str());
+            Brain.Screen.print("%s/3149279 checked", std::to_string(counter * 256).c_str());
+            
         }
 
         size_t read_count = fread(buffer, sizeof(state_solution), SOLUTION_BUFFER_SIZE, file);
@@ -110,6 +112,12 @@ std::string find_solution(std::string stringified_state_struct, FILE *file)
 
                     if (orientation == needed_orientation)
                     {
+                        Brain.Screen.setCursor(8, 1);
+                        Brain.Screen.clearLine();
+                        Brain.Screen.print("solution found");
+                        wait(2, seconds);
+                        Brain.Screen.clearLine();
+
                         found = true;
                         
                         bool decoding_done = false;
@@ -132,6 +140,11 @@ std::string find_solution(std::string stringified_state_struct, FILE *file)
             // Check if we finished the file without finding anything
             if (read_count != SOLUTION_BUFFER_SIZE && !found)
             {
+                Brain.Screen.setCursor(8, 1);
+                Brain.Screen.clearLine();
+                Brain.Screen.print("solution not found");
+                wait(2, seconds);
+                Brain.Screen.clearLine();
                 reading_complete = true;
             }
         }

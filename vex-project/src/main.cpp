@@ -18,44 +18,48 @@ using namespace vex;
 
 int main()
 {
-    bool emergency_stop = false;
-    int move_counter = 0;
     // Configure robot
     vexcode_init();
+
     // Open file
-    // FILE *file = fopen("SkewSolutions.bin", "rb");
-    // if (!file)
-    // {
-    //     print_status("Couldn't open file. Aborting...");
-    //     wait(10, seconds);
-    //     Brain.programStop();
-    // }
+    FILE *file = fopen("SkewSolutions.bin", "rb");
+    if (!file)
+    {
+        print_status("Couldn't open file. Abort...");
+        wait(10, seconds);
+        Brain.programStop();
+    }
 
-    // // Get state from serial
-    // print_status("Awaiting data...");
-    // std::string raw_state_string = get_state_from_serial();
+    // Get state from serial
+    print_status("Awaiting data...");
+    std::string raw_state_string = get_state_from_serial();
 
-    // // Process state
-    // print_status("Processing...");
-    // std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
+    // Process state
+    print_status("Processing...");
+    std::string state_struct_stringified = find_normalized_stringified_struct(raw_state_string);
 
-    // wait(2, seconds);
+    wait(2, seconds);
 
-    // // Obtain solution
-    // print_status("Searching...");
-    // std::string solution = find_solution(state_struct_stringified, file);
+    // Obtain solution
+    print_status("Searching...");
+    std::string solution = find_solution(state_struct_stringified, file);
+    fclose(file);
+    if(solution == "")
+    {
+        print_status("Couldn't find solution. Abort...");
+        wait(10, seconds);
+        Brain.programStop(); 
+    }
 
-    // fclose(file);
+    wait(2, seconds);
 
-    // wait(2, seconds);
+    // Use sensor to validate cube placement
+    // loops until valid
+    char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
+    validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
 
-    // // Use sensor to validate cube placement
-    // // loops until valid
-    // char expected_char = state_struct_stringified[SENSOR_SIDE_CENTER_INDEX];
-    // validate_cube_placement(expected_char, distance_sensor, optical_sensor, touch_led);
-
-    // wait(2, seconds);
-    std::string solution = "FlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLu";
+    wait(2, seconds);
+    // std::string solution = "FlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLuFlUfLu";
 
     // Wait for touch to start solve
     print_status("Ready!");
