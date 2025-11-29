@@ -3,6 +3,8 @@
 //  Module:       main.cpp
 //  Description:  The main entrypoint
 //  Authors:      MTE 100 & 121 Group 15
+//  References
+//  - https://cplusplus.com/reference/cstdio/fopen/ 
 //
 //----------------------------------------------------------------------------
 
